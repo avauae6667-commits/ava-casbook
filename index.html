@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0b3d3a"/>
+<title>AVA Cash Book — Accounting &amp; Excel Manager</title>
+<meta name="description" content="Multi-account cash book with Excel import/export, VAT, P&L and bank reconciliation for AVA Passengers Transport, Dubai."/>
+<style>
+:root{
+  --teal:#0b3d3a; --teal2:#0f4f4a; --teal3:#14655e; --gold:#d6b265; --gold2:#b8954a;
+  --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9; --card:#fff;
+  --ok:#047857; --okbg:#d1fae5; --warn:#b45309; --warnbg:#fef3c7; --bad:#be123c; --badbg:#ffe4e6;
+  --radius:14px; --shadow:0 1px 3px rgba(15,23,42,.08),0 4px 14px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14.5px;line-height:1.45}
+header.topbar{background:linear-gradient(135deg,var(--teal) 0%,var(--teal2) 60%,var(--teal3) 100%);color:#fff;padding:14px 0 0;box-shadow:var(--shadow)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{background:var(--gold);color:var(--teal);font-weight:800;border-radius:10px;padding:8px 10px;font-size:15px;letter-spacing:1px}
+.brand h1{margin:0;font-size:18px}
+.brand p{margin:0;font-size:12px;opacity:.85}
+.spacer{flex:1}
+.savestate{display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(255,255,255,.12);padding:5px 10px;border-radius:20px}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ade80;display:inline-block}
+.dot.pulse{animation:pulse .9s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.7)}100%{box-shadow:0 0 0 8px rgba(74,222,128,0)}}
+nav.nav{display:flex;gap:2px;margin-top:12px;overflow-x:auto;padding-bottom:0}
+nav.nav button{background:transparent;border:0;color:#cfe3e0;padding:10px 14px;font-size:13.5px;font-weight:600;cursor:pointer;border-radius:10px 10px 0 0;white-space:nowrap}
+nav.nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+nav.nav button.on{background:var(--bg);color:var(--teal)}
+main{padding:18px 0 40px}
+footer{padding:14px 0 26px;color:var(--muted);font-size:12px}
+.hero{background:linear-gradient(135deg,var(--teal2),var(--teal3));color:#fff;border-radius:var(--radius);padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.hero h2{margin:0;font-size:20px}
+.hero p{margin:2px 0 0;font-size:13px;opacity:.85}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:14px;overflow:hidden}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.card-h h3{margin:0;font-size:14.5px}
+.card-b{padding:14px 16px}
+.grid{display:grid;gap:12px}
+.grid.c4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.grid.c3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.kpi{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px}
+.kpi .lbl{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.kpi .val{font-size:21px;font-weight:800;margin-top:4px}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.pos{color:var(--ok)} .neg{color:var(--bad)}
+.btn{border:0;border-radius:10px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer;background:#e2e8f0;color:var(--ink)}
+.btn:hover{filter:brightness(.96)}
+.btn-primary{background:var(--teal2);color:#fff}
+.btn-gold{background:var(--gold);color:#3d2f0f}
+.btn-danger{background:var(--badbg);color:var(--bad)}
+.btn-xs{padding:6px 10px;font-size:12.5px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.chip{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700}
+.chip.ok{background:var(--okbg);color:var(--ok)}
+.chip.warn{background:var(--warnbg);color:var(--warn)}
+.chip.bad{background:var(--badbg);color:var(--bad)}
+.chip.neutral{background:#e2e8f0;color:#475569}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;text-align:left;padding:8px 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #eef2f7;vertical-align:top}
+tr:hover td{background:#f8fafc}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.strong{font-weight:700}
+.rowin td{background:#f0fdf9}
+.rowout td{background:#fff7f7}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:12px 16px;border-bottom:1px solid var(--line);background:#fbfdfe}
+.field{display:flex;flex-direction:column;gap:4px;min-width:130px}
+.field label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:13.5px;background:#fff;font-family:inherit}
+.field input:focus,.field select:focus{outline:2px solid var(--teal3);outline-offset:0;border-color:transparent}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.formgrid .full{grid-column:1/-1}
+.section-lbl{grid-column:1/-1;font-size:12px;font-weight:800;color:var(--teal2);text-transform:uppercase;letter-spacing:.5px;border-top:1px dashed var(--line);padding-top:10px;margin-top:2px}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;z-index:50;overflow:auto}
+.modal{background:#fff;border-radius:16px;max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal.wide{max-width:900px}
+.modal-h{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal-h h3{margin:0;font-size:16px}
+.modal-h .x{border:0;background:#eef2f7;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px}
+.modal-b{padding:16px 18px;max-height:65vh;overflow:auto}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line);background:#fbfdfe;border-radius:0 0 16px 16px}
+.toast{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:99}
+.toast div{background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);transition:opacity .4s}
+.toast div.ok{background:var(--ok)} .toast div.bad{background:var(--bad)}
+.alert{border-radius:10px;padding:10px 14px;font-size:13px;margin:10px 0}
+.alert.warn{background:var(--warnbg);color:var(--warn)}
+.alert.bad{background:var(--badbg);color:var(--bad)}
+.alert.ok{background:var(--okbg);color:var(--ok)}
+.muted{color:var(--muted)} .tiny{font-size:11.5px}
+.mt{margin-top:12px}.mb{margin-bottom:12px}
+.split{display:grid;gap:14px}
+.split.split2{grid-template-columns:1fr 1fr}
+@media(max-width:820px){.split.split2{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}}
+.progressbar{height:8px;background:#e2e8f0;border-radius:6px;overflow:hidden}
+.progressbar i{display:block;height:100%;background:var(--teal3)}
+.steps{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.step{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;background:#e2e8f0;color:#64748b}
+.step.on{background:var(--teal2);color:#fff}
+.step.done{background:var(--okbg);color:var(--ok)}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted);cursor:pointer;background:#fbfdfe}
+.drop.drag{border-color:var(--teal3);background:#eff8f6}
+input[type=file]{display:none}
+.badge-acc{display:inline-block;background:#eef6f5;color:var(--teal2);border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700}
+/* vouchers */
+.vline{display:grid;grid-template-columns:1fr 64px 110px 90px 34px;gap:6px;align-items:center;margin-bottom:6px}
+@media(max-width:640px){.vline{grid-template-columns:1fr 56px 90px 34px}.vl-amt{display:none}}
+.vline input{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;width:100%;font-family:inherit}
+/* ---------- print (A4 voucher sheet) ---------- */
+#printArea{display:none}
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+  body{background:#fff}
+  header.topbar,main,footer,#modalHost,.toast,#toastHost{display:none !important}
+  #printArea{display:block !important}
+  .pv-sheet{font-family:'Segoe UI',Arial,sans-serif;color:#000;font-size:12px}
+  .pv-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #0b3d3a;padding-bottom:8px}
+  .pv-mark{background:#0b3d3a;color:#d6b265;font-weight:800;border-radius:8px;padding:8px 10px;font-size:16px;letter-spacing:1px}
+  .pv-co{font-size:15px;font-weight:800;color:#0b3d3a}
+  .pv-title{text-align:center;font-size:16px;font-weight:800;letter-spacing:3px;margin:10px 0;color:#0b3d3a}
+  .pv-meta{width:100%;border-collapse:collapse;margin-bottom:8px}
+  .pv-meta td{border:0;padding:3px 6px;font-size:12px}
+  .pv-items{width:100%;border-collapse:collapse}
+  .pv-items th,.pv-items td{border:1px solid #333;padding:5px 7px;font-size:12px}
+  .pv-items th{background:#e8f0ef;text-align:left}
+  .pv-items .num,.pv-items tfoot td{text-align:right}
+  .pv-items tfoot td{border:1px solid #333;font-weight:600}
+  .pv-words{margin:10px 0;padding:7px 10px;border:1px dashed #666;border-radius:6px;font-size:12px}
+  .pv-note{margin:6px 0;font-size:12px}
+  .pv-sign{width:100%;border-collapse:collapse;margin-top:28mm}
+  .pv-sign td{border:1px solid #333;height:22mm;vertical-align:bottom;padding:5px 8px;font-size:11px}
+  .pv-foot{margin-top:8mm;text-align:center;color:#444}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="row1">
+      <div class="brand">
+        <div class="mark">AVA</div>
+        <div><h1>AVA Cash Book</h1><p>Accounting &amp; Excel Manager · Dubai, UAE</p></div>
+      </div>
+      <div class="spacer"></div>
+      <span class="savestate"><span class="dot" id="saveDot"></span><span id="saveTxt">Saved</span></span>
+    </div>
+    <nav class="nav" id="nav" aria-label="Tabs"></nav>
+  </div>
+</header>
+<main><div class="wrap" id="view"></div></main>
+<footer><div class="wrap"><b>AVA PASSENGERS TRANSPORT</b> · Dubai, UAE · P.O. Box 91977<span id="footNote" class="tiny" style="display:block"></span></div></footer>
+<div id="modalHost"></div>
+<div id="printArea"></div>
+<div class="toast" id="toastHost"></div>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+/* ================= AVA CASH BOOK — CORE ENGINE (pure, DOM-free) ================= */
+'use strict';
+const KEY = 'ava-cashbook-xlsx-v1';
+const APP_VERSION = 'AX1.0';
+
+const DEFAULT_CATS = {
+  'Diesel': ['ADNOC Wallet','Diesel - UAQ (Three Star)','Diesel - Sharjah (Three Star)','Diesel - Ajman (Al Bahar)'],
+  'Income': ['ALICO Project Income','Data UAQ Income','Headline Income','Ajman Furniture Income','Exalogic Income'],
+  'Rent': ['General Fleet Rent','UAQ Rent / DATS','Other Rent'],
+  'Salaries': ['Driver Salary','Staff Salary','Salary Deposit'],
+  'Permits': ['RAK Permit','Sharjah Permit','Dubai Permit','Parking Permit / Fees'],
+  'Maintenance': ['New Tires','Used Tires','Batteries','Spare Parts','Workshop'],
+  'Expenses': ['General Fleet Maintenance','Camry Expense','Office Expenses'],
+  'AVA': ['AVA Office Rent','AVA Trade License','AVA Visas','AVA Telephone','AVA VAT','AVA Fines','AVA Salik'],
+  'Vehicle hire (subcontract)': ['Bus hire','Pick-up hire','Salik recharge'],
+  'Bank charges': ['Maintenance fee','Cheque book','Remittance charge','Teller charges'],
+  'Cheque payments': ['To be assigned'],
+  'Returned cheque': [],
+  'Owner drawings': [],
+  'Capital introduced': [],
+  'Other': []
+};
+
+function freshData() {
+  return {
+    app: 'ava-cashbook', version: APP_VERSION,
+    exported: new Date().toISOString(),
+    settings: { cats: JSON.parse(JSON.stringify(DEFAULT_CATS)), co: { name: 'AVA PASSENGERS TRANSPORT', addr: 'P.O. Box 91977, Dubai, UAE | Phone: 00971 4 3439666 | Email: Contact@avarental.ae' } },
+    accounts: [
+      { id: 'acc-bank', name: 'Bank', kind: 'bank', opening: 0 },
+      { id: 'acc-petty', name: 'Petty Cash', kind: 'cash', opening: 0 }
+    ],
+    tx: [], lockDate: '', updatedAt: 0
+  };
+}
+
+/* ---------- money math (integer fils = 1/100 AED) ---------- */
+const parseAmount = (v) => {
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') { if (!isFinite(v)) return 0; return Math.round(v * 100); }
+  const s = String(v).replace(/,/g, '').replace(/[^\d.()\-]/g, '');
+  if (!s) return 0;
+  const neg = /^\(.*\)$/.test(String(v).trim());
+  const n = parseFloat(neg ? s.slice(1, -1) : s);
+  return isNaN(n) ? 0 : Math.round(n * 100);
+};
+const fmt = (fils, cur = true) => {
+  if (!isFinite(fils)) fils = 0;
+  const neg = fils < 0, a = Math.abs(fils) / 100;
+  const s = a.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (neg ? '-' : '') + (cur ? 'AED ' : '') + s;
+};
+const fmt2 = (fils) => fmt(fils, false);
+/* ---------- amount in words (UAE legal style) ---------- */
+const ONES_W = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+const TENS_W = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+function chunkWords(n, label) {
+  if (!n) return '';
+  const h = Math.floor(n / 100), r = n % 100;
+  let s = '';
+  if (h) s += ONES_W[h] + ' Hundred' + (r ? ' and ' : '');
+  if (r) { if (r < 20) s += ONES_W[r]; else { s += TENS_W[Math.floor(r / 10)]; if (r % 10) s += '-' + ONES_W[r % 10]; } }
+  return s + (label ? ' ' + label : '');
+}
+function words(fils) {
+  if (!fils) return 'Zero Dirhams Only';
+  const neg = fils < 0, abs = Math.abs(Math.round(fils));
+  const dh = Math.floor(abs / 100), fl = abs % 100;
+  const bil = Math.floor(dh / 1e9), mil = Math.floor((dh % 1e9) / 1e6), th = Math.floor((dh % 1e6) / 1e3), rest = dh % 1e3;
+  const parts = [];
+  if (bil) parts.push(chunkWords(bil, 'Billion'));
+  if (mil) parts.push(chunkWords(mil, 'Million'));
+  if (th) parts.push(chunkWords(th, 'Thousand'));
+  if (rest) parts.push(chunkWords(rest, ''));
+  let out = (neg ? 'Minus ' : '') + (parts.join(' ') || 'Zero') + ' Dirham' + (dh === 1 ? '' : 's');
+  if (fl) out += ' and ' + chunkWords(fl, '') + ' Fils';
+  return out + ' Only';
+}
+const calcVat = (netFils, mode) => {
+  if (mode === 'included') { const net = Math.round(netFils * 100 / 105); return { net, vat: netFils - net, total: netFils }; }
+  if (mode === 'added') { const vat = Math.round(netFils * 5 / 100); return { net: netFils, vat, total: netFils + vat }; }
+  return { net: netFils, vat: 0, total: netFils };
+};
+
+/* ---------- dates ---------- */
+const pad2 = (n) => String(n).padStart(2, '0');
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); };
+const excelSerialToISO = (n) => {
+  const ms = Math.round((n - 25569) * 86400 * 1000);
+  const d = new Date(ms);
+  return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth() + 1) + '-' + pad2(d.getUTCDate());
+};
+const normalizeDate = (v) => {
+  if (v === null || v === undefined || v === '') return '';
+  if (v instanceof Date && !isNaN(v)) {
+    let y = v.getFullYear(), m = v.getMonth() + 1, d = v.getDate();
+    if (y < 100) y += 2000;
+    return (y >= 1990 && y <= 2100) ? y + '-' + pad2(m) + '-' + pad2(d) : '';
+  }
+  if (typeof v === 'number' && v > 20000 && v < 80000) return excelSerialToISO(v);
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+  if (m) { const y = +m[1], mo = +m[2], d = +m[3]; return (y >= 1990 && y <= 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) ? y + '-' + pad2(mo) + '-' + pad2(d) : ''; }
+  m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/);
+  if (m) { let d = +m[1], mo = +m[2], y = +m[3]; if (y < 100) y += 2000; if (d > 12 && mo <= 12) { const t = d; d = mo; mo = t; } return (y >= 1990 && y <= 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) ? y + '-' + pad2(mo) + '-' + pad2(d) : ''; }
+  const p = new Date(s);
+  if (!isNaN(p)) { const y = p.getFullYear(); if (y >= 1990 && y <= 2100) return y + '-' + pad2(p.getMonth() + 1) + '-' + pad2(p.getDate()); }
+  return '';
+};
+const monthKey = (d) => (d || '').slice(0, 7);
+
+/* ---------- balances ---------- */
+function computeBalances(accounts, tx) {
+  const out = {};
+  accounts.forEach((a) => { out[a.id] = { opening: Number(a.opening) || 0, in: 0, out: 0, closing: Number(a.opening) || 0, count: 0 }; });
+  tx.forEach((t) => {
+    if (t.deleted) return;
+    const b = out[t.acc]; if (!b) return;
+    if (t.type === 'in') { b.in += t.amt; b.closing += t.amt; } else { b.out += t.amt; b.closing -= t.amt; }
+    b.count++;
+  });
+  return out;
+}
+function runningBalance(tx, accId, opening) {
+  const rows = tx.filter((t) => !t.deleted && t.acc === accId).sort((a, b) => a.date === b.date ? (a.createdAt || 0) - (b.createdAt || 0) : (a.date < b.date ? -1 : 1));
+  let bal = parseAmount(opening);
+  return rows.map((t) => { bal += (t.type === 'in' ? t.amt : -t.amt); return { t, bal }; });
+}
+
+/* ---------- Excel import ---------- */
+const HEADER_ALIASES = {
+  date: ['date','txn date','transaction date','voucher date','entry date','تاريخ'],
+  account: ['account','account name','acc','cash/bank','book','cash book','account *'],
+  description: ['description','details','narration','particulars','desc','item'],
+  in: ['debit (money in)','debit','money in','in','receipt','deposit','income','amount in','dr','cash in','received'],
+  out: ['credit (money out)','credit','out','payment','money out','withdrawal','expense','amount out','cr','cash out','paid'],
+  amount: ['amount','amount (aed)','value','total','net amount','gross'],
+  direction: ['type','direction','dr/cr','txn type','transaction type','d/c','in/out'],
+  category: ['category','cat','head','account head','group'],
+  sub: ['subcategory','sub category','sub','sub head','sub-category'],
+  party: ['party','paid to','received from','payee','beneficiary','name','party name'],
+  vehicle: ['vehicle','vehicle no','vehicle no.','plate','plate no','bus','bus no'],
+  driver: ['driver','driver name','drv'],
+  pm: ['payment method','method','mode','paid by','paid via','payment mode'],
+  chq: ['cheque','cheque no','cheque number','chq','chq no','cheque #','cheque no.'],
+  ref: ['reference','ref','reference no','ref no','voucher no','cheque ref','ref.'],
+  vatMode: ['vat mode','vat treatment','vat?'],
+  vatAmt: ['vat amount','vat (aed)','vat aed','vat'],
+  notes: ['notes','note','remarks','comment']
+};
+function canonHeader(h) {
+  const s = String(h == null ? '' : h).toLowerCase().replace(/\s+/g, ' ').replace(/[:*]/g, '').trim();
+  return s;
+}
+function mapHeaders(headers) {
+  const map = {}, used = new Set();
+  // specific fields first so "VAT Amount" is not stolen by generic "amount"
+  const order = ['date', 'account', 'description', 'in', 'out', 'vatMode', 'vatAmt', 'direction', 'amount', 'category', 'sub', 'party', 'vehicle', 'driver', 'pm', 'chq', 'ref', 'notes'];
+  for (const field of order) {
+    const aliases = HEADER_ALIASES[field];
+    let idx = -1;
+    for (const a of aliases) {
+      const exact = headers.findIndex((h) => !used.has(String(h)) && canonHeader(h) === a);
+      if (exact >= 0) { idx = exact; break; }
+    }
+    if (idx < 0) {
+      for (const a of aliases) {
+        const part = headers.findIndex((h) => !used.has(String(h)) && canonHeader(h).includes(a) && a.length > 2);
+        if (part >= 0) { idx = part; break; }
+      }
+    }
+    if (idx >= 0) { map[field] = idx; used.add(String(headers[idx])); }
+  }
+  return map;
+}
+function directionFrom(row, map, headers) {
+  if (map.in != null || map.out != null) {
+    const di = parseAmount(map.in != null ? row[map.in] : 0);
+    const do_ = parseAmount(map.out != null ? row[map.out] : 0);
+    if (di && do_) return { dir: 'both', amt: 0 };
+    if (di) return { dir: 'in', amt: di };
+    if (do_) return { dir: 'out', amt: do_ };
+    return { dir: 'none', amt: 0 };
+  }
+  if (map.amount != null && map.direction != null) {
+    const amt = parseAmount(row[map.amount]);
+    const d = canonHeader(row[map.direction]);
+    const isIn = /^(in|receipt|received|deposit|credit|dr|income|money in|inflow)/.test(d);
+    const isOut = /^(out|payment|paid|withdrawal|debit|expense|money out|outflow)/.test(d);
+    if (!amt) return { dir: 'none', amt: 0 };
+    if (isIn) return { dir: 'in', amt };
+    if (isOut) return { dir: 'out', amt };
+    return { dir: 'unknown', amt };
+  }
+  return { dir: 'none', amt: 0 };
+}
+function rowsFromSheet(sheetRows) {
+  if (!sheetRows || sheetRows.length < 2) return { headers: [], map: {}, rows: [] };
+  const headers = sheetRows[0].map((h) => String(h == null ? '' : h));
+  const map = mapHeaders(headers);
+  const rows = [];
+  for (let i = 1; i < sheetRows.length; i++) {
+    const r = sheetRows[i];
+    if (!r || r.every((c) => c === null || c === undefined || String(c).trim() === '')) continue;
+    const d = directionFrom(r, map);
+    const vatModeRaw = map.vatMode != null ? canonHeader(r[map.vatMode]) : '';
+    const vatMode = vatModeRaw.includes('incl') ? 'included' : vatModeRaw.includes('add') ? 'added' : (vatModeRaw && vatModeRaw !== 'none' ? 'included' : 'none');
+    rows.push({
+      _i: i + 1, date: map.date != null ? normalizeDate(r[map.date]) : '',
+      account: map.account != null ? String(r[map.account] == null ? '' : r[map.account]).trim() : '',
+      desc: map.description != null ? String(r[map.description] == null ? '' : r[map.description]).trim() : '',
+      dir: d.dir, amt: d.amt,
+      cat: map.category != null ? String(r[map.category] == null ? '' : r[map.category]).trim() : '',
+      sub: map.sub != null ? String(r[map.sub] == null ? '' : r[map.sub]).trim() : '',
+      party: map.party != null ? String(r[map.party] == null ? '' : r[map.party]).trim() : '',
+      veh: map.vehicle != null ? String(r[map.vehicle] == null ? '' : r[map.vehicle]).trim() : '',
+      drv: map.driver != null ? String(r[map.driver] == null ? '' : r[map.driver]).trim() : '',
+      pm: map.pm != null ? String(r[map.pm] == null ? '' : r[map.pm]).trim() : '',
+      chq: map.chq != null ? String(r[map.chq] == null ? '' : r[map.chq]).trim() : '',
+      ref: map.ref != null ? String(r[map.ref] == null ? '' : r[map.ref]).trim() : '',
+      vatMode, vatAmt: map.vatAmt != null ? parseAmount(r[map.vatAmt]) : 0,
+      notes: map.notes != null ? String(r[map.notes] == null ? '' : r[map.notes]).trim() : ''
+    });
+  }
+  return { headers, map, rows };
+}
+function validateImportRows(rows, accounts, existingTx) {
+  const errors = [], seen = new Set(), dups = [];
+  const accNames = new Map(accounts.map((a) => [a.name.toLowerCase(), a]));
+  const badRows = new Set();
+  rows.forEach((r) => {
+    const errs = [];
+    if (!r.date) errs.push('Missing / unreadable date');
+    if (!r.account) errs.push('Missing account name');
+    else if (!accNames.has(r.account.toLowerCase())) errs.push('Unknown account "' + r.account + '" (add it in Settings)');
+    if (r.dir === 'none') errs.push('No amount (Debit / Credit both empty)');
+    if (r.dir === 'both') errs.push('Both Debit and Credit filled on one row');
+    if (r.dir === 'unknown') errs.push('Cannot read direction (use Debit = money in, Credit = money out)');
+    if (r.amt < 0) errs.push('Negative amount');
+    if (errs.length) { errors.push({ row: r._i, errs }); badRows.add(r._i); }
+  });
+  // duplicate detection runs on rows that passed the basic checks; only the FIRST occurrence is imported
+  rows.forEach((r) => {
+    if (badRows.has(r._i)) return;
+    const key = [r.date, r.account.toLowerCase(), r.dir, r.amt, (r.desc || '').toLowerCase()].join('|');
+    if (seen.has(key)) { dups.push({ row: r._i, note: 'Duplicate row inside this file (first occurrence kept)' }); return; }
+    if ((existingTx || []).some((t) => !t.deleted && t.date === r.date && String(t.accName || '').toLowerCase() === r.account.toLowerCase() && t.type === r.dir && t.amt === r.amt && (t.desc || '').toLowerCase() === (r.desc || '').toLowerCase())) { dups.push({ row: r._i, note: 'Already exists in the app (skipped)' }); return; }
+    seen.add(key);
+  });
+  const dupSet = new Set(dups.map((d) => d.row));
+  return { errors, dups, valid: rows.filter((r) => !badRows.has(r._i) && !dupSet.has(r._i)) };
+}
+function makeTxFromImport(r, accounts, stamp) {
+  const acc = accounts.find((a) => a.name.toLowerCase() === r.account.toLowerCase());
+  let vat = 0;
+  if (r.vatAmt > 0) vat = r.vatAmt;
+  else if (r.vatMode === 'included') vat = r.amt - Math.round(r.amt * 100 / 105);
+  else if (r.vatMode === 'added') vat = Math.round(r.amt * 5 / 100);
+  return {
+    uid: 'av-' + stamp.toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+    date: r.date, acc: acc.id, accName: acc.name, type: r.dir, amt: r.amt, vat,
+    desc: r.desc || '—', party: r.party, cat: r.cat, sub: r.sub, veh: r.veh, drv: r.drv,
+    pm: r.pm, chq: r.chq || undefined, ref: r.ref, notes: r.notes,
+    tr: '', by: 'Excel import', createdAt: stamp++, deleted: false
+  };
+}
+function pairTransfers(newTx) {
+  const byRef = new Map();
+  newTx.forEach((t) => { if (t.ref) { const k = t.ref.toLowerCase(); if (!byRef.has(k)) byRef.set(k, []); byRef.get(k).push(t); } });
+  byRef.forEach((list) => {
+    if (list.length !== 2) return;
+    const [a, b] = list;
+    if (a.type !== b.type && a.acc !== b.acc) { const id = 'IMP-' + a.ref; a.tr = id; b.tr = id; }
+  });
+}
+
+/* ---------- Excel export (template format, with live Summary formulas) ---------- */
+function buildWorkbook(data) {
+  const wb = { SheetNames: ['Instructions', 'Accounts', 'Transactions', 'Summary'], Sheets: {} };
+  const instr = [
+    ['AVA CASH BOOK — EXPORTED DATA'],
+    ['This file was exported from AVA Cash Book. You can edit it and import it back in the app.'],
+    ['Debit (Money In) = money received · Credit (Money Out) = money paid.'],
+    ['The Summary sheet contains live formulas and updates automatically.']
+  ];
+  wb.Sheets['Instructions'] = { '!ref': 'A1:B4' };
+  instr.forEach((r, i) => { r.forEach((c, j) => { wb.Sheets['Instructions'][String.fromCharCode(65 + j) + (i + 1)] = { v: c, t: 's' }; }); });
+  const accs = data.accounts || [];
+  const accRows = [['Account Name', 'Type', 'Opening Balance (AED)', 'Notes']].concat(
+    accs.map((a) => [a.name, a.kind === 'bank' ? 'Bank' : 'Cash', a.opening != null ? a.opening / 100 : 0, '']));
+  wb.Sheets['Accounts'] = rowsToSheet(accRows, [{ wch: 26 }, { wch: 10 }, { wch: 22 }, { wch: 30 }]);
+  const txRows = [['Date', 'Account', 'Description', 'Debit (Money In)', 'Credit (Money Out)', 'Category', 'Subcategory', 'Party / Paid To', 'Vehicle', 'Driver', 'Payment Method', 'Cheque No', 'Reference', 'VAT Mode', 'VAT Amount (AED)', 'Notes', 'Voucher No']];
+  const tx = (data.tx || []).filter((t) => !t.deleted).sort((a, b) => a.date === b.date ? (a.createdAt || 0) - (b.createdAt || 0) : (a.date < b.date ? -1 : 1));
+  tx.forEach((t) => {
+    txRows.push([t.date, t.accName || accNameOf(data, t.acc), t.desc, t.type === 'in' ? t.amt / 100 : '', t.type === 'out' ? t.amt / 100 : '',
+      t.cat || '', t.sub || '', t.party || '', t.veh || '', t.drv || '', t.pm || '', t.chq || '', t.ref || '',
+      t.vat > 0 ? 'VAT Included' : 'None', t.vat > 0 ? t.vat / 100 : '', t.notes || '', t.pv || '']);
+  });
+  wb.Sheets['Transactions'] = rowsToSheet(txRows, [{ wch: 12 }, { wch: 18 }, { wch: 34 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 22 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 13 }, { wch: 16 }, { wch: 24 }, { wch: 16 }]);
+  // Vouchers detail sheet (payment vouchers with line items)
+  const vRows = [['Voucher No', 'Date', 'Account', 'Payee', 'Payee TRN', 'Category', 'Sub', 'Vehicle', 'Driver', 'Payment Method', 'Cheque No', 'VAT Mode', 'VAT (AED)', 'Total (AED)', 'Items']];
+  tx.filter((t) => t.pv).forEach((t) => {
+    vRows.push([t.pv, t.date, t.accName || accNameOf(data, t.acc), t.party || '', t.partyTrn || '', t.cat || '', t.sub || '', t.veh || '', t.drv || '', t.pm || '', t.chq || '', t.vatMode || 'none', (t.vat || 0) / 100, t.amt / 100,
+      (t.lines || []).map((l) => l.desc + ' x' + (l.qty == null || l.qty === '' ? '1' : l.qty) + ' @' + ((parseAmount(l.rate) || 0) / 100).toFixed(2)).join(' | ')]);
+  });
+  wb.Sheets['Vouchers'] = rowsToSheet(vRows, [{ wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 50 }]);
+  wb.SheetNames.splice(3, 0, 'Vouchers');
+  const sum = [];
+  sum.push(['AVA CASH BOOK — AUTOMATIC SUMMARY']);
+  sum.push([]);
+  sum.push(['ACCOUNT BALANCES']);
+  sum.push(['Account', 'Type', 'Opening (AED)', 'Total In (AED)', 'Total Out (AED)', 'Closing Balance (AED)']);
+  const n = Math.max(accs.length, 1);
+  for (let i = 0; i < accs.length; i++) {
+    const r = 5 + i, ar = i + 2;
+    sum.push([
+      { f: 'Accounts!A' + ar }, { f: 'Accounts!B' + ar }, { f: 'Accounts!C' + ar },
+      { f: 'SUMIFS(Transactions!D:D,Transactions!B:B,Accounts!A' + ar + ')' },
+      { f: 'SUMIFS(Transactions!E:E,Transactions!B:B,Accounts!A' + ar + ')' },
+      { f: 'C' + r + '+D' + r + '-E' + r }
+    ]);
+  }
+  const balRow = 5 + accs.length + 1;
+  sum.push([]); sum.push(['OVERALL TOTALS']);
+  sum.push(['Total money in', { f: 'SUM(Transactions!D2:D100000)' }]);
+  sum.push(['Total money out', { f: 'SUM(Transactions!E2:E100000)' }]);
+  sum.push(['Net movement', { f: 'SUM(Transactions!D2:D100000)-SUM(Transactions!E2:E100000)' }]);
+  sum.push(['Total opening balances', { f: 'SUM(Accounts!C2:C200)' }]);
+  sum.push(['Total cash position', { f: 'SUM(Accounts!C2:C200)+SUM(Transactions!D2:D100000)-SUM(Transactions!E2:E100000)' }]);
+  wb.Sheets['Summary'] = rowsToSheet(sum, [{ wch: 26 }, { wch: 10 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 22 }]);
+  return wb;
+}
+function accNameOf(data, id) { const a = (data.accounts || []).find((x) => x.id === id); return a ? a.name : id; }
+function rowsToSheet(rows, cols) {
+  const ws = {}; let range = { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+  rows.forEach((row, ri) => {
+    row.forEach((cell, ci) => {
+      if (cell === null || cell === undefined || cell === '') return;
+      const addr = XLSX.utils.encode_cell({ r: ri, c: ci });
+      if (typeof cell === 'object' && cell.f) ws[addr] = { t: 'n', f: cell.f };
+      else if (typeof cell === 'number') ws[addr] = { t: 'n', v: cell };
+      else ws[addr] = { t: 's', v: String(cell) };
+    });
+    if (row.length - 1 > range.e.c) range.e.c = row.length - 1;
+    range.e.r = ri;
+  });
+  ws['!ref'] = XLSX.utils.encode_range(range);
+  if (cols) ws['!cols'] = cols;
+  return ws;
+}
+
+/* ---------- CSV / P&L helpers ---------- */
+function toCsv(rows) { return rows.map((r) => r.map((c) => '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"').join(',')).join('\r\n'); }
+function plByCategory(tx, from, to) {
+  const m = new Map();
+  tx.forEach((t) => {
+    if (t.deleted) return;
+    if (from && t.date < from) return;
+    if (to && t.date > to) return;
+    if (t.tr) return;
+    const c = t.cat || 'Uncategorised';
+    if (!m.has(c)) m.set(c, { cat: c, in: 0, out: 0, vat: 0 });
+    const e = m.get(c);
+    if (t.type === 'in') e.in += t.amt; else e.out += t.amt;
+    e.vat += t.vat || 0;
+  });
+  return [...m.values()].sort((a, b) => (b.in - b.out) - (a.in - a.out));
+}
+function vatSummary(tx, from, to) {
+  let salesNet = 0, salesVat = 0, purchNet = 0, purchVat = 0, n = 0;
+  tx.forEach((t) => {
+    if (t.deleted || t.tr) return;
+    if (from && t.date < from) return;
+    if (to && t.date > to) return;
+    n++;
+    if (t.type === 'in') { salesNet += (t.amt - (t.vat || 0)); salesVat += (t.vat || 0); }
+    else { purchNet += (t.amt - (t.vat || 0)); purchVat += (t.vat || 0); }
+  });
+  return { salesNet, salesVat, purchNet, purchVat, payable: salesVat - purchVat, count: n };
+}
+
+/* ================= AVA CASH BOOK — UI LAYER ================= */
+const S = { tab: 'dashboard', view: null, importStep: 1, importParsed: null, filters: { acc: '', type: '', cat: '', from: '', to: '', q: '' }, plFrom: '', plTo: '' };
+let DATA = null;
+const $id = (i) => document.getElementById(i);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { const d = JSON.parse(raw); if (d && d.tx && d.settings && d.accounts) return d; }
+  } catch (e) {}
+  return freshData();
+}
+function save(silent) {
+  try { localStorage.setItem(KEY, JSON.stringify(DATA)); DATA.updatedAt = Date.now(); }
+  catch (e) { toast('Could not save (storage full). Export a backup.', 'bad'); return; }
+  if (!silent) pulseSaved();
+}
+function pulseSaved() {
+  const el = $id('saveTxt'), dot = $id('saveDot'); if (!el) return;
+  el.textContent = 'Saved'; dot.className = 'dot pulse';
+  clearTimeout(pulseSaved._t);
+  pulseSaved._t = setTimeout(() => { el.textContent = 'Saved · ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }, 900);
+}
+function toast(msg, kind) {
+  const host = $id('toastHost'); const d = document.createElement('div');
+  d.className = kind === 'bad' ? 'bad' : kind === 'ok' ? 'ok' : ''; d.textContent = msg;
+  host.appendChild(d); setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 450); }, 3200);
+}
+
+const TABS = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'vouchers', label: 'Vouchers' },
+  { id: 'cashbook', label: 'All Accounts' },
+  { id: 'import', label: 'Import Excel' },
+  { id: 'reports', label: 'Reports & P&L' },
+  { id: 'vat', label: 'VAT' },
+  { id: 'sync', label: 'Sync & Backup' },
+  { id: 'settings', label: 'Settings' }
+];
+function go(t) { S.tab = t; render(); window.scrollTo(0, 0); }
+
+function liveTx() { return (DATA.tx || []).filter((t) => !t.deleted); }
+function balMap() { return computeBalances(DATA.accounts, liveTx()); }
+function txSorted() { return liveTx().slice().sort((a, b) => b.date === a.date ? (b.createdAt || 0) - (a.createdAt || 0) : (b.date > a.date ? 1 : -1)); }
+function locked(date) { return !!(DATA.lockDate && date && date <= DATA.lockDate); }
+
+/* ---------- rendering ---------- */
+function render() {
+  const nav = $id('nav');
+  nav.innerHTML = TABS.map((t) => '<button class="' + (S.tab === t.id ? 'on' : '') + '" data-act="tab" data-id="' + t.id + '">' + esc(t.label) + '</button>').join('');
+  let html = '';
+  try {
+    if (S.tab === 'dashboard') html = viewDashboard();
+    else if (S.tab === 'vouchers') html = viewVouchers();
+    else if (S.tab === 'cashbook') html = viewCashbook();
+    else if (S.tab === 'import') html = viewImport();
+    else if (S.tab === 'reports') html = viewReports();
+    else if (S.tab === 'vat') html = viewVat();
+    else if (S.tab === 'sync') html = viewSync();
+    else if (S.tab === 'settings') html = viewSettings();
+  } catch (e) { console.error(e); html = '<div class="alert bad"><b>Screen error:</b> ' + esc(e.message) + '</div>'; }
+  $id('view').innerHTML = html;
+  $id('footNote').textContent = APP_VERSION + ' · ' + liveTx().length + ' entries · ' + DATA.accounts.length + ' accounts · saved on this device';
+}
+
+function kpi(lbl, val, sub, cls) {
+  return '<div class="kpi"><div class="lbl">' + lbl + '</div><div class="val ' + (cls || '') + '">' + val + '</div><div class="sub">' + (sub || '') + '</div></div>';
+}
+function viewDashboard() {
+  const bal = balMap(); const txs = txSorted();
+  const totalPos = DATA.accounts.reduce((s, a) => s + bal[a.id].closing, 0);
+  const thisMonth = monthKey(today());
+  const mIn = txs.filter((t) => monthKey(t.date) === thisMonth && t.type === 'in').reduce((s, t) => s + t.amt, 0);
+  const mOut = txs.filter((t) => monthKey(t.date) === thisMonth && t.type === 'out').reduce((s, t) => s + t.amt, 0);
+  const vat = vatSummary(liveTx(), thisMonth + '-01', thisMonth + '-31');
+  let h = '<div class="hero"><div><h2>Dashboard</h2><p>' + esc(DATA.settings.co.name) + ' · ' + DATA.accounts.length + ' accounts</p></div>' +
+    '<div><button class="btn btn-gold btn-xs" data-act="newTx">+ Add Entry</button> <button class="btn btn-primary btn-xs" data-act="goImport">⭱ Import Excel</button> <button class="btn btn-xs" data-act="downloadTemplate">⭳ Blank Template</button></div></div>';
+  h += '<div class="grid c4 mt">' +
+    kpi('Total cash position', fmt(totalPos), 'across all accounts') +
+    kpi('Received this month', fmt(mIn), thisMonth, 'pos') +
+    kpi('Paid this month', fmt(mOut), thisMonth, mOut ? 'neg' : '') +
+    kpi('VAT this month', fmt(vat.payable), 'payable (sales − purchases)', vat.payable >= 0 ? '' : 'neg') + '</div>';
+  h += '<div class="card"><div class="card-h"><h3>Account balances</h3><span class="chip neutral">' + DATA.accounts.length + ' accounts</span></div><div class="tablewrap"><table><thead><tr><th>Account</th><th>Type</th><th class="num">Opening</th><th class="num">Total In</th><th class="num">Total Out</th><th class="num">Closing</th><th></th></tr></thead><tbody>' +
+    DATA.accounts.map((a) => { const b = bal[a.id]; return '<tr><td class="strong">' + esc(a.name) + '</td><td><span class="badge-acc">' + (a.kind === 'bank' ? 'Bank' : 'Cash') + '</span></td><td class="num">' + fmt2(b.opening) + '</td><td class="num pos">+' + fmt2(b.in) + '</td><td class="num neg">−' + fmt2(b.out) + '</td><td class="num strong">' + fmt(b.closing) + '</td><td><button class="btn btn-xs" data-act="openAcc" data-id="' + esc(a.id) + '">Open</button></td></tr>'; }).join('') +
+    '</tbody></table></div></div>';
+  h += '<div class="card"><div class="card-h"><h3>Recent entries</h3><button class="btn btn-xs" data-act="tab" data-id="cashbook">View all</button></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Account</th><th>Description</th><th>Category</th><th class="num">In</th><th class="num">Out</th></tr></thead><tbody>' +
+    (txs.slice(0, 12).map((t) => txRow(t, false)).join('') || '<tr><td colspan="6" class="muted">No entries yet — add one or import an Excel file.</td></tr>') +
+    '</tbody></table></div></div>';
+  return h;
+}
+function txRow(t, showBal, bal) {
+  return '<tr class="' + (t.type === 'in' ? 'rowin' : 'rowout') + '"><td>' + esc(t.date) + '</td><td><span class="badge-acc">' + esc(t.accName || t.acc) + '</span></td>' +
+    '<td>' + esc(t.desc) + (t.party ? ' <span class="tiny muted">· ' + esc(t.party) + '</span>' : '') + (t.chq ? ' <span class="tiny muted">· chq ' + esc(t.chq) + '</span>' : '') + (t.tr ? ' <span class="chip neutral">transfer</span>' : '') + '</td>' +
+    '<td>' + esc(t.cat || '') + (t.sub ? ' <span class="tiny muted">/ ' + esc(t.sub) + '</span>' : '') + '</td>' +
+    '<td class="num pos strong">' + (t.type === 'in' ? fmt2(t.amt) : '') + '</td>' +
+    '<td class="num neg strong">' + (t.type === 'out' ? fmt2(t.amt) : '') + '</td>' +
+    (showBal ? '<td class="num">' + fmt2(bal) + '</td>' : '') +
+    '<td class="num"><button class="btn btn-xs" data-act="editTx" data-id="' + esc(t.uid) + '">Edit</button></td></tr>';
+}
+function viewCashbook(fixedAcc) {
+  const f = S.filters; let rows = txSorted();
+  if (f.acc) rows = rows.filter((t) => t.acc === f.acc);
+  if (f.type) rows = rows.filter((t) => t.type === f.type);
+  if (f.cat) rows = rows.filter((t) => t.cat === f.cat);
+  if (f.from) rows = rows.filter((t) => t.date >= f.from);
+  if (f.to) rows = rows.filter((t) => t.date <= f.to);
+  if (f.q) { const q = f.q.toLowerCase(); rows = rows.filter((t) => [t.desc, t.party, t.cat, t.sub, t.veh, t.ref, t.chq, t.drv].some((x) => (x || '').toLowerCase().includes(q))); }
+  const selAcc = DATA.accounts.find((a) => a.id === f.acc);
+  const inT = rows.filter((t) => t.type === 'in').reduce((s, t) => s + t.amt, 0);
+  const outT = rows.filter((t) => t.type === 'out').reduce((s, t) => s + t.amt, 0);
+  let opening = selAcc ? selAcc.opening : 0;
+  if (selAcc) rows.filter((t) => f.from && t.date < f.from).forEach((t) => { opening += (t.type === 'in' ? t.amt : -t.amt); });
+  let running = opening;
+  const withBal = selAcc ? rows.slice().reverse().map((t) => { running += (t.type === 'in' ? t.amt : -t.amt); return { t, bal: running }; }).reverse() : rows.map((t) => ({ t, bal: null }));
+  let h = '<div class="hero"><div><h2>All Accounts</h2><p>Cash book with running balances</p></div><div>' +
+    '<button class="btn btn-gold btn-xs" data-act="newTx">+ Add Entry</button> <button class="btn btn-xs" data-act="transferModal">⇄ Transfer</button> <button class="btn btn-xs" data-act="exportCsv">⭳ CSV</button> <button class="btn btn-primary btn-xs" data-act="exportXlsx">⭳ Excel (template)</button></div></div>';
+  h += '<div class="card"><div class="filters">' +
+    '<div class="field"><label>Account</label><select id="facc"><option value="">All accounts</option>' + DATA.accounts.map((a) => '<option value="' + esc(a.id) + '"' + (f.acc === a.id ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Type</label><select id="ftype"><option value="">All</option><option value="in"' + (f.type === 'in' ? ' selected' : '') + '>Money in</option><option value="out"' + (f.type === 'out' ? ' selected' : '') + '>Money out</option></select></div>' +
+    '<div class="field"><label>Category</label><select id="fcat"><option value="">All</option>' + Object.keys(DATA.settings.cats).map((c) => '<option' + (f.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>From</label><input type="date" id="ffrom" value="' + esc(f.from) + '"></div>' +
+    '<div class="field"><label>To</label><input type="date" id="fto" value="' + esc(f.to) + '"></div>' +
+    '<div class="field" style="min-width:200px"><label>Search</label><input id="fq" placeholder="description, party, cheque…" value="' + esc(f.q) + '"></div>' +
+    '<button class="btn btn-xs" data-act="clearFilters">Clear</button></div>';
+  h += '<div class="card-h" style="padding:10px 16px"><h3>' + (selAcc ? esc(selAcc.name) + ' — running balance' : 'All entries') + '</h3><div><span class="chip ok">In ' + fmt(inT) + '</span> <span class="chip bad">Out ' + fmt(outT) + '</span> <span class="chip neutral">Net ' + fmt(inT - outT) + '</span></div></div>';
+  h += '<div class="tablewrap"><table><thead><tr><th>Date</th><th>Account</th><th>Description</th><th>Category</th><th class="num">In</th><th class="num">Out</th>' + (selAcc ? '<th class="num">Balance</th>' : '') + '<th></th></tr></thead><tbody>' +
+    (selAcc ? '<tr><td></td><td></td><td class="strong">Opening' + (f.from ? ' (to ' + esc(f.from) + ')' : '') + '</td><td></td><td></td><td></td>' + (selAcc ? '<td class="num strong">' + fmt2(opening) + '</td>' : '') + '<td></td></tr>' : '') +
+    (withBal.map((r) => txRow(r.t, !!selAcc, r.bal)).join('') || '<tr><td colspan="8" class="muted">No entries match the filters.</td></tr>') +
+    '</tbody></table></div></div>';
+  return h;
+}
+
+/* ---------- Import Excel ---------- */
+function viewImport() {
+  let h = '<div class="hero"><div><h2>Import Excel</h2><p>Upload a transaction file for any account — template format or your own columns</p></div><div><button class="btn btn-xs" data-act="downloadTemplate">⭳ Blank Template</button></div></div>';
+  h += '<div class="steps mt"><span class="step ' + (S.importStep === 1 ? 'on' : 'done') + '">1 · Choose file</span><span class="step ' + (S.importStep === 2 ? 'on' : '') + '">2 · Map &amp; preview</span><span class="step ' + (S.importStep === 3 ? 'on' : '') + '">3 · Import</span></div>';
+  if (S.importStep === 1) {
+    h += '<div class="card"><div class="card-b"><div class="drop" id="drop" data-act="pickFile">📄 Drop your Excel file here, or click to choose<br><span class="tiny">.xlsx / .xls / .csv — first sheet is read</span></div>' +
+      '<input type="file" id="importFile" accept=".xlsx,.xls,.csv">' +
+      '<div class="alert mt"><b>Column rules:</b> the app auto-detects <b>Date, Account, Debit (money in) / Credit (money out)</b> (or an Amount + Direction pair), Category, Party, Cheque No, VAT and more. Unknown accounts must exist in Settings first. Duplicate rows (in the file or already in the app) are flagged.</div></div></div>';
+  } else if (S.importStep === 2 && S.importParsed) {
+    const P = S.importParsed;
+    h += '<div class="card"><div class="card-h"><h3>File: ' + esc(P.fileName) + '</h3><span class="chip neutral">' + P.rows.length + ' data rows</span></div><div class="card-b">' +
+      '<div class="formgrid mb"><div class="field"><label>Detected columns</label><div class="tiny">' + P.headers.map((x, i) => (i + 1) + '. ' + esc(x || '(blank)')).join('<br>') + '</div></div>' +
+      '<div class="field"><label>Mapping</label><div class="tiny">' + Object.entries(P.map).map(([k, v]) => '<b>' + k + '</b> → ' + esc(P.headers[v])).join('<br>') + '<br><span class="muted">' + P.headers.filter((x, i) => !Object.values(P.map).includes(i)).map(esc).join(', ') + ' → ignored</span></div></div></div>';
+    if (P.rows.length && !P.map.date && P.map.amount == null) h += '<div class="alert bad">No recognisable columns found. Use the template (Date, Account, Debit, Credit…).</div>';
+    const V = P.validation;
+    h += '<div class="alert ok"><b>' + V.valid.length + '</b> rows ready to import · <span class="chip bad">' + V.errors.length + ' with errors</span> <span class="chip warn">' + V.dups.length + ' duplicates</span></div>';
+    if (V.errors.length) h += '<div class="alert bad"><b>Rows that will be skipped:</b><br>' + V.errors.slice(0, 30).map((e) => 'Row ' + e.row + ': ' + e.errs.join('; ')).join('<br>') + (V.errors.length > 30 ? '<br>… and ' + (V.errors.length - 30) + ' more' : '') + '</div>';
+    if (V.dups.length) h += '<div class="alert warn"><b>Duplicates skipped:</b><br>' + V.dups.slice(0, 20).map((d) => 'Row ' + d.row + ': ' + d.note).join('<br>') + '</div>';
+    h += '<div class="tablewrap"><table><thead><tr><th>Row</th><th>Date</th><th>Account</th><th>Description</th><th class="num">In</th><th class="num">Out</th><th>Category</th><th class="num">VAT</th></tr></thead><tbody>' +
+      V.valid.slice(0, 40).map((r) => '<tr><td>' + r._i + '</td><td>' + esc(r.date) + '</td><td><span class="badge-acc">' + esc(r.account) + '</span></td><td>' + esc(r.desc) + '</td><td class="num pos">' + (r.dir === 'in' ? fmt2(r.amt) : '') + '</td><td class="num neg">' + (r.dir === 'out' ? fmt2(r.amt) : '') + '</td><td>' + esc(r.cat) + '</td><td class="num">' + fmt2(r.vatAmt) + '</td></tr>').join('') +
+      '</tbody></table></div><p class="tiny muted">Showing first ' + Math.min(40, V.valid.length) + ' valid rows.</p></div>' +
+      '<div class="modal-f"><button class="btn" data-act="importRestart">Start over</button><button class="btn btn-primary" data-act="importCommit"' + (V.valid.length ? '' : ' disabled') + '>✔ Import ' + V.valid.length + ' rows</button></div></div>';
+  } else if (S.importStep === 3) {
+    const R = S.importResult;
+    h += '<div class="card"><div class="card-b"><div class="alert ok"><b>Import complete.</b><br>' + R.added + ' entries added across ' + R.accts + ' account(s).' + (R.createdAccs ? ' ' + R.createdAccs + ' new account(s) created from the Accounts sheet.' : '') + (R.transfers ? ' ' + R.transfers + ' transfer pair(s) linked by matching Reference.' : '') + '</div>' +
+      '<div class="tablewrap"><table><thead><tr><th>Account</th><th class="num">Rows added</th><th class="num">Money in</th><th class="num">Money out</th></tr></thead><tbody>' +
+      R.perAcc.map((p) => '<tr><td class="strong">' + esc(p.name) + '</td><td class="num">' + p.n + '</td><td class="num pos">' + fmt2(p.in) + '</td><td class="num neg">' + fmt2(p.out) + '</td></tr>').join('') +
+      '</tbody></table></div></div><div class="modal-f"><button class="btn btn-primary" data-act="tab" data-id="cashbook">View cash book</button><button class="btn" data-act="importRestart">Import another file</button></div></div>';
+  }
+  return h;
+}
+
+/* ---------- Reports & VAT ---------- */
+function viewReports() {
+  const txs = liveTx();
+  const pl = plByCategory(txs, S.plFrom, S.plTo);
+  const totIn = pl.reduce((s, r) => s + r.in, 0), totOut = pl.reduce((s, r) => s + r.out, 0);
+  let h = '<div class="hero"><div><h2>Reports &amp; P&amp;L</h2><p>Income vs expense by category' + (S.plFrom || S.plTo ? ' (filtered period)' : ' (all time)') + '</p></div><div>' +
+    '<div class="field"><label>From</label><input type="date" id="plFrom" value="' + esc(S.plFrom) + '"></div>' +
+    '<div class="field"><label>To</label><input type="date" id="plTo" value="' + esc(S.plTo) + '"></div>' +
+    '<button class="btn btn-xs" data-act="exportPlCsv">⭳ CSV</button></div></div>';
+  h += '<div class="grid c3 mt">' + kpi('Total income', fmt(totIn), '', 'pos') + kpi('Total expenses', fmt(totOut), '', 'neg') +
+    kpi('Net profit', fmt(totIn - totOut), totIn - totOut >= 0 ? 'surplus' : 'loss', totIn - totOut >= 0 ? 'pos' : 'neg') + '</div>';
+  h += '<div class="card"><div class="card-h"><h3>By category</h3></div><div class="tablewrap"><table><thead><tr><th>Category</th><th class="num">Income</th><th class="num">Expense</th><th class="num">Net</th><th class="num">VAT</th></tr></thead><tbody>' +
+    pl.map((r) => { const net = r.in - r.out; return '<tr><td class="strong">' + esc(r.cat) + '</td><td class="num pos">' + fmt2(r.in) + '</td><td class="num neg">' + fmt2(r.out) + '</td><td class="num strong ' + (net >= 0 ? 'pos' : 'neg') + '">' + fmt2(net) + '</td><td class="num muted">' + fmt2(r.vat) + '</td></tr>'; }).join('') +
+    '<tr><td class="strong">TOTAL</td><td class="num strong pos">' + fmt2(totIn) + '</td><td class="num strong neg">' + fmt2(totOut) + '</td><td class="num strong">' + fmt2(totIn - totOut) + '</td><td class="num muted">' + fmt2(pl.reduce((s, r) => s + r.vat, 0)) + '</td></tr>' +
+    '</tbody></table></div></div>';
+  return h;
+}
+function viewVat() {
+  const y = new Date().getFullYear();
+  const quarters = [[1, 3], [4, 6], [7, 9], [10, 12]];
+  const q = S.vatQ || Math.floor(new Date().getMonth() / 3) + 1;
+  const from = y + '-' + pad2(quarters[q - 1][0]) + '-01', to = y + '-' + pad2(quarters[q - 1][1]) + '-' + (quarters[q - 1][1] === 12 ? '31' : pad2(new Date(y, quarters[q - 1][1], 0).getDate()));
+  const r = vatSummary(liveTx(), from, to);
+  let h = '<div class="hero"><div><h2>VAT Return (UAE 5%)</h2><p>Working paper for ' + from + ' → ' + to + '</p></div><div>' +
+    '<div class="field"><label>Quarter</label><select id="vatQ">' + [1, 2, 3, 4].map((i) => '<option value="' + i + '"' + (q === i ? ' selected' : '') + '>Q' + i + '</option>').join('') + '</select></div>' +
+    '<button class="btn btn-xs" data-act="exportVatCsv">⭳ CSV</button></div></div>';
+  const boxes = [['Box 1 · Standard-rated sales (net)', r.salesNet], ['Box 2 · Output VAT collected', r.salesVat], ['Box 3 · Standard-rated purchases (net)', r.purchNet], ['Box 4 · Input VAT recoverable', r.purchVat], ['Box 5 · Net VAT payable / (refundable)', r.payable]];
+  h += '<div class="card"><div class="tablewrap"><table><thead><tr><th>Box</th><th class="num">Amount AED</th></tr></thead><tbody>' +
+    boxes.map((b, i) => '<tr><td class="strong">' + b[0] + '</td><td class="num ' + (i === 4 ? 'strong' : '') + '">' + fmt2(b[1]) + '</td></tr>').join('') +
+    '</tbody></table></div><div class="card-b tiny muted">' + r.count + ' transactions in period · transfers excluded. Figures are a working paper — confirm with your auditor before filing.</div></div>';
+  return h;
+}
+
+/* ---------- Settings ---------- */
+function viewSettings() {
+  const bal = balMap();
+  let h = '<div class="hero"><div><h2>Settings</h2><p>Accounts, backup and restore</p></div><div>' +
+    '<button class="btn btn-xs" data-act="downloadTemplate">⭳ Blank Template</button> <button class="btn btn-primary btn-xs" data-act="exportXlsx">⭳ Excel export</button> <button class="btn btn-xs" data-act="exportJson">⭳ JSON backup</button></div></div>';
+  h += '<div class="card"><div class="card-h"><h3>Accounts</h3><button class="btn btn-gold btn-xs" data-act="addAccount">+ Add account</button></div><div class="tablewrap"><table><thead><tr><th>Name</th><th>Type</th><th class="num">Opening</th><th class="num">Balance</th><th></th></tr></thead><tbody>' +
+    DATA.accounts.map((a) => '<tr><td class="strong">' + esc(a.name) + '</td><td>' + (a.kind === 'bank' ? 'Bank' : 'Cash') + '</td><td class="num">' + fmt2(parseAmount(a.opening)) + '</td><td class="num strong">' + fmt(bal[a.id].closing) + '</td><td><button class="btn btn-xs" data-act="editAccount" data-id="' + esc(a.id) + '">Edit</button> <button class="btn btn-danger btn-xs" data-act="delAccount" data-id="' + esc(a.id) + '">Delete</button></td></tr>').join('') +
+    '</tbody></table></div></div>';
+  h += '<div class="split split2 mt"><div class="card"><div class="card-h"><h3>Company &amp; lock</h3></div><div class="card-b"><div class="formgrid">' +
+    '<div class="field full"><label>Company name</label><input id="coName" value="' + esc(DATA.settings.co.name) + '"></div>' +
+    '<div class="field full"><label>Address line</label><input id="coAddr" value="' + esc(DATA.settings.co.addr) + '"></div>' +
+    '<div class="field"><label>Lock date (no edits before)</label><input type="date" id="lockDate" value="' + esc(DATA.lockDate || '') + '"></div></div>' +
+    '<button class="btn btn-primary btn-xs mt" data-act="saveCompany">Save settings</button></div></div>' +
+    '<div class="card"><div class="card-h"><h3>Restore backup</h3></div><div class="card-b">' +
+    '<div class="drop" data-act="pickRestore" style="padding:16px">⭱ Choose a JSON backup file</div><input type="file" id="restoreFile" accept=".json">' +
+    '<div class="alert warn mt">Restoring replaces ALL data on this device. Excel (.xlsx) restores go through the Import Excel tab.</div></div></div></div>';
+  h += '<div class="card"><div class="card-h"><h3>Danger zone</h3></div><div class="card-b"><button class="btn btn-danger btn-xs" data-act="resetData">Erase all data &amp; start fresh</button></div></div>';
+  return h;
+}
+
+/* ---------- modals ---------- */
+function openModal(inner, size) {
+  $id('modalHost').innerHTML = '<div class="overlay" data-act="overlayBg"><div class="modal ' + (size || '') + '">' + inner + '</div></div>';
+}
+function closeModal() { $id('modalHost').innerHTML = ''; }
+function openTxModal(uid) {
+  const t = uid ? liveTx().find((x) => x.uid === uid) : null;
+  const acc0 = t ? t.acc : DATA.accounts[0].id;
+  const body = '<div class="formgrid">' +
+    '<div class="field full"><label>Direction</label><div>' +
+    '<label style="margin-right:16px;font-weight:400"><input type="radio" name="txDir" value="in"' + (t && t.type === 'in' ? ' checked' : '') + '> Money in (received)</label>' +
+    '<label style="font-weight:400"><input type="radio" name="txDir" value="out"' + (!t || t.type === 'out' ? ' checked' : '') + '> Money out (paid)</label></div></div>' +
+    '<div class="field"><label>Date</label><input type="date" id="txDate" value="' + (t ? t.date : today()) + '"></div>' +
+    '<div class="field"><label>Account</label><select id="txAcc">' + DATA.accounts.map((a) => '<option value="' + esc(a.id) + '"' + (a.id === acc0 ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Amount (AED)</label><input id="txAmt" inputmode="decimal" value="' + (t ? (t.amt / 100).toFixed(2) : '') + '"></div>' +
+    '<div class="field"><label>VAT mode</label><select id="txVat"><option value="none">No VAT</option><option value="included"' + (t && t.vat > 0 ? ' selected' : '') + '>VAT included (5%)</option></select></div>' +
+    '<div class="field full"><label>Description</label><input id="txDesc" value="' + esc(t ? t.desc : '') + '"></div>' +
+    '<div class="field"><label>Category</label><select id="txCat"><option value=""></option>' + Object.keys(DATA.settings.cats).map((c) => '<option' + (t && t.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Subcategory</label><select id="txSub"><option value=""></option></select></div>' +
+    '<div class="field"><label>Party / paid to</label><input id="txParty" value="' + esc(t ? t.party || '' : '') + '"></div>' +
+    '<div class="field"><label>Payment method</label><select id="txPm">' + ['', 'Cash', 'Bank transfer', 'Cheque', 'Card', 'Cash deposit'].map((m) => '<option' + (t && t.pm === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Cheque No (bank only)</label><input id="txChq" value="' + esc(t ? t.chq || '' : '') + '"></div>' +
+    '<div class="field"><label>Reference</label><input id="txRef" value="' + esc(t ? t.ref || '' : '') + '"></div>' +
+    '<div class="field"><label>Vehicle</label><input id="txVeh" value="' + esc(t ? t.veh || '' : '') + '"></div>' +
+    '<div class="field"><label>Driver</label><input id="txDrv" value="' + esc(t ? t.drv || '' : '') + '"></div>' +
+    '<div class="field full"><label>Notes</label><input id="txNotes" value="' + esc(t ? t.notes || '' : '') + '"></div></div>';
+  openModal('<div class="modal-h"><h3>' + (t ? 'Edit entry' : 'New cash entry') + '</h3><button class="x" data-act="closeModal">✕</button></div><div class="modal-b">' + body + '</div><div class="modal-f"><button class="btn" data-act="closeModal">Cancel</button><button class="btn btn-primary" data-act="saveTx" data-id="' + esc(uid || '') + '">' + (t ? 'Update' : 'Post entry') + '</button></div>');
+  const catSel = $id('txCat'); const fillSub = () => {
+    const subs = DATA.settings.cats[catSel.value] || [];
+    $id('txSub').innerHTML = '<option value=""></option>' + subs.map((s) => '<option' + (t && t.sub === s ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
+  };
+  fillSub(); catSel.addEventListener('change', fillSub);
+}
+function saveTxFromModal(uid) {
+  const amt = parseAmount($id('txAmt').value);
+  if (!amt) return toast('Enter an amount first.', 'bad');
+  const date = $id('txDate').value || today();
+  if (locked(date)) return toast('That period is locked.', 'bad');
+  const mode = $id('txVat').value;
+  const dir = document.querySelector('input[name=txDir]:checked').value;
+  const accId = $id('txAcc').value;
+  const acc = DATA.accounts.find((a) => a.id === accId);
+  const cv = calcVat(amt, mode);
+  const chq = $id('txChq').value.trim();
+  if (chq && acc.kind !== 'bank') return toast('Cheques can only be used on a Bank-type account.', 'bad');
+  const patch = { date, acc: accId, accName: acc.name, type: dir, amt: cv.total, vat: cv.vat, desc: $id('txDesc').value.trim() || '—', party: $id('txParty').value.trim(), cat: $id('txCat').value, sub: $id('txSub').value, veh: $id('txVeh').value.trim(), drv: $id('txDrv').value.trim(), ref: $id('txRef').value.trim(), pm: $id('txPm').value, chq: chq || undefined, notes: $id('txNotes').value.trim(), by: 'manual' };
+  if (uid) { const i = DATA.tx.findIndex((x) => x.uid === uid); if (i >= 0) DATA.tx[i] = { ...DATA.tx[i], ...patch }; }
+  else DATA.tx.unshift({ uid: 'av-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8), createdAt: Date.now(), deleted: false, tr: '', ...patch });
+  save(); closeModal(); render(); toast(uid ? 'Entry updated.' : 'Entry posted.', 'ok');
+}
+function openTransferModal() {
+  const bal = balMap();
+  openModal('<div class="modal-h"><h3>Transfer between accounts</h3><button class="x" data-act="closeModal">✕</button></div><div class="modal-b"><div class="formgrid">' +
+    '<div class="field"><label>Date</label><input type="date" id="trDate" value="' + today() + '"></div>' +
+    '<div class="field"><label>Amount (AED)</label><input id="trAmt" inputmode="decimal"></div>' +
+    '<div class="field"><label>From</label><select id="trFrom">' + DATA.accounts.map((a) => '<option value="' + esc(a.id) + '">' + esc(a.name) + ' · ' + fmt(bal[a.id].closing) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>To</label><select id="trTo">' + DATA.accounts.map((a, i) => '<option value="' + esc(a.id) + '"' + (i === 1 ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field full"><label>Reference / note</label><input id="trNote"></div></div></div>' +
+    '<div class="modal-f"><button class="btn" data-act="closeModal">Cancel</button><button class="btn btn-primary" data-act="saveTransfer">Transfer</button></div>');
+}
+function saveTransfer() {
+  const date = $id('trDate').value || today(); if (locked(date)) return toast('That period is locked.', 'bad');
+  const from = $id('trFrom').value, to = $id('trTo').value, amt = parseAmount($id('trAmt').value), note = $id('trNote').value.trim();
+  if (from === to) return toast('Pick two different accounts.', 'bad');
+  if (!amt) return toast('Enter the amount.', 'bad');
+  const trId = 'TR-' + Date.now().toString(36);
+  const acc = (id) => DATA.accounts.find((a) => a.id === id);
+  const now = Date.now();
+  DATA.tx.unshift({ uid: 'av-' + now.toString(36) + 'a', date, acc: from, accName: acc(from).name, type: 'out', amt, vat: 0, desc: 'Transfer to ' + acc(to).name, tr: trId, createdAt: now, deleted: false });
+  DATA.tx.unshift({ uid: 'av-' + now.toString(36) + 'b', date, acc: to, accName: acc(to).name, type: 'in', amt, vat: 0, desc: 'Transfer from ' + acc(from).name, tr: trId, createdAt: now + 1, deleted: false });
+  save(); closeModal(); render(); toast('Transfer posted.', 'ok');
+}
+function accountModal(id) {
+  const a = id ? DATA.accounts.find((x) => x.id === id) : null;
+  openModal('<div class="modal-h"><h3>' + (a ? 'Edit account' : 'New account') + '</h3><button class="x" data-act="closeModal">✕</button></div><div class="modal-b"><div class="formgrid">' +
+    '<div class="field full"><label>Account name</label><input id="accName" value="' + esc(a ? a.name : '') + '"></div>' +
+    '<div class="field"><label>Type</label><select id="accKind"><option value="bank"' + (a && a.kind === 'bank' ? ' selected' : '') + '>Bank</option><option value="cash"' + (a && a.kind === 'cash' ? ' selected' : '') + '>Cash</option></select></div>' +
+    '<div class="field"><label>Opening balance (AED)</label><input id="accOpening" inputmode="decimal" value="' + (a ? (a.opening / 100).toFixed(2) : '') + '"></div></div>' +
+    '<div class="alert warn mt">Changing the opening balance re-bases every running balance for this account.</div></div>' +
+    '<div class="modal-f"><button class="btn" data-act="closeModal">Cancel</button><button class="btn btn-primary" data-act="saveAccount" data-id="' + esc(id || '') + '">Save</button></div>');
+}
+function saveAccount(id) {
+  const name = $id('accName').value.trim(); if (!name) return toast('Enter an account name.', 'bad');
+  const dup = DATA.accounts.some((a) => a.name.toLowerCase() === name.toLowerCase() && a.id !== id);
+  if (dup) return toast('An account with that name already exists.', 'bad');
+  const kind = $id('accKind').value, opening = parseAmount($id('accOpening').value);
+  if (id) { const a = DATA.accounts.find((x) => x.id === id); a.name = name; a.kind = kind; a.opening = opening; DATA.tx.forEach((t) => { if (t.acc === id) t.accName = name; }); }
+  else DATA.accounts.push({ id: 'acc-' + Date.now().toString(36), name, kind, opening });
+  save(); closeModal(); render(); toast('Account saved.', 'ok');
+}
+function delAccount(id) {
+  const a = DATA.accounts.find((x) => x.id === id);
+  const n = liveTx().filter((t) => t.acc === id).length;
+  if (!confirm('Delete account "' + a.name + '"?' + (n ? ' It has ' + n + ' entries — they will be hidden, not lost.' : ''))) return;
+  if (DATA.accounts.length <= 1) return toast('Keep at least one account.', 'bad');
+  DATA.accounts = DATA.accounts.filter((x) => x.id !== id);
+  DATA.tx.forEach((t) => { if (t.acc === id) t.deleted = true; });
+  save(); render(); toast('Account deleted.', 'ok');
+}
+
+/* ---------- file handling ---------- */
+function readFile(file) {
+  const rd = new FileReader();
+  rd.onload = () => { try { ingestWorkbook(new Uint8Array(rd.result), file.name); } catch (e) { console.error(e); toast('Could not read that file: ' + e.message, 'bad'); } };
+  rd.readAsArrayBuffer(file);
+}
+function ingestWorkbook(buf, fileName) {
+  const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+  // pick the sheet that actually contains transactions (template has several)
+  let sheetName = wb.SheetNames[0], sheetRows = null;
+  for (const sn of wb.SheetNames) {
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: null });
+    const m = rows.length ? mapHeaders(rows[0].map((h) => String(h == null ? '' : h))) : {};
+    if (m.date != null && (m.in != null || m.out != null || (m.amount != null && m.direction != null))) { sheetName = sn; sheetRows = rows; break; }
+  }
+  if (!sheetRows) sheetRows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, raw: true, defval: null });
+  const parsed = rowsFromSheet(sheetRows);
+  parsed.fileName = fileName; parsed.sheetName = sheetName;
+  // optional Accounts sheet from the template
+  parsed.newAccounts = [];
+  if (wb.Sheets['Accounts']) {
+    const accRows = XLSX.utils.sheet_to_json(wb.Sheets['Accounts'], { header: 1, raw: true, defval: null });
+    (accRows.slice(1) || []).forEach((r) => {
+      if (!r || !r[0] || String(r[0]).trim() === '') return;
+      const name = String(r[0]).trim();
+      const exists = DATA.accounts.some((a) => a.name.toLowerCase() === name.toLowerCase());
+      if (!exists) parsed.newAccounts.push({ name, kind: String(r[1] || '').toLowerCase() === 'bank' ? 'bank' : 'cash', opening: parseAmount(r[2]) });
+    });
+  }
+  parsed.validation = validateImportRows(parsed.rows, DATA.accounts.concat(parsed.newAccounts.map((a) => ({ id: 'new', name: a.name }))), liveTx());
+  S.importParsed = parsed; S.importStep = 2; render();
+}
+function commitImport() {
+  const P = S.importParsed, V = P.validation;
+  let stamp = Date.now();
+  // create accounts found in the file's Accounts sheet first
+  let createdAccs = 0;
+  (P.newAccounts || []).forEach((a) => {
+    const id = 'acc-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 5);
+    DATA.accounts.push({ id, name: a.name, kind: a.kind, opening: a.opening });
+    createdAccs++;
+  });
+  const newTx = V.valid.map((r) => makeTxFromImport(r, DATA.accounts, stamp));
+  // renumber createdAt sequentially to preserve file order
+  newTx.forEach((t, i) => { t.createdAt = stamp + i; });
+  pairTransfers(newTx);
+  DATA.tx = newTx.concat(DATA.tx);
+  const perAcc = new Map();
+  newTx.forEach((t) => {
+    if (!perAcc.has(t.acc)) perAcc.set(t.acc, { name: t.accName, n: 0, in: 0, out: 0 });
+    const p = perAcc.get(t.acc); p.n++;
+    if (t.type === 'in') p.in += t.amt; else p.out += t.amt;
+  });
+  S.importResult = { added: newTx.length, accts: perAcc.size, transfers: newTx.filter((t) => t.tr).length / 2, perAcc: [...perAcc.values()], createdAccs };
+  save(); S.importStep = 3; S.importParsed = null; render();
+  toast('Imported ' + newTx.length + ' entries.', 'ok');
+}
+function download(name, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+function downloadTemplate(blank) {
+  const data = blank ? freshData() : DATA;
+  const wb = buildWorkbook(data);
+  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  download(blank ? 'AVA-CashBook-Template.xlsx' : 'ava-cashbook-' + today() + '.xlsx', new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+  toast('Excel file downloaded.', 'ok');
+}
+function exportCsv() {
+  const head = ['Date', 'Account', 'Direction', 'Description', 'Party', 'Category', 'Sub', 'Vehicle', 'Driver', 'VAT', 'Amount', 'Cheque', 'Reference', 'Method'];
+  const rows = txSorted().map((t) => [t.date, t.accName || t.acc, t.type === 'in' ? 'IN' : 'OUT', t.desc, t.party || '', t.cat || '', t.sub || '', t.veh || '', t.drv || '', (t.vat / 100).toFixed(2), (t.amt / 100).toFixed(2), t.chq || '', t.ref || '', t.pm || '']);
+  download('ava-cashbook-' + today() + '.csv', new Blob([toCsv([head, ...rows])], { type: 'text/csv;charset=utf-8' }));
+  toast('CSV downloaded.', 'ok');
+}
+function exportPlCsv() {
+  const pl = plByCategory(liveTx(), S.plFrom, S.plTo);
+  const rows = [['Category', 'Income (AED)', 'Expense (AED)', 'Net (AED)', 'VAT (AED)'], ...pl.map((r) => [r.cat, (r.in / 100).toFixed(2), (r.out / 100).toFixed(2), ((r.in - r.out) / 100).toFixed(2), (r.vat / 100).toFixed(2)])];
+  download('ava-pnl-' + today() + '.csv', new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+}
+function exportVatCsv() {
+  const y = new Date().getFullYear(), quarters = [[1, 3], [4, 6], [7, 9], [10, 12]], q = S.vatQ || 1;
+  const from = y + '-' + pad2(quarters[q - 1][0]) + '-01', to = y + '-' + pad2(quarters[q - 1][1]) + '-30';
+  const r = vatSummary(liveTx(), from, to);
+  const rows = [['AVA VAT working paper', from, to], [], ['Box', 'Amount AED'], ['Sales (net)', (r.salesNet / 100).toFixed(2)], ['Output VAT', (r.salesVat / 100).toFixed(2)], ['Purchases (net)', (r.purchNet / 100).toFixed(2)], ['Input VAT', (r.purchVat / 100).toFixed(2)], ['Net payable', (r.payable / 100).toFixed(2)]];
+  download('ava-vat-q' + q + '-' + y + '.csv', new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+}
+function exportJson() { download('ava-cashbook-backup-' + today() + '.json', new Blob([JSON.stringify({ ...DATA, exported: new Date().toISOString() }, null, 2)], { type: 'application/json' })); }
+
+/* ---------- actions ---------- */
+const ACTIONS = {
+  tab: (el) => go(el.dataset.id),
+  overlayBg: (el, e) => { if (e.target === el) closeModal(); },
+  closeModal,
+  newTx: () => openTxModal(null),
+  editTx: (el) => openTxModal(el.dataset.id),
+  saveTx: (el) => saveTxFromModal(el.dataset.id || null),
+  transferModal: openTransferModal,
+  saveTransfer,
+  addAccount: () => accountModal(null),
+  editAccount: (el) => accountModal(el.dataset.id),
+  saveAccount: (el) => saveAccount(el.dataset.id || null),
+  delAccount: (el) => delAccount(el.dataset.id),
+  openAcc: (el) => { S.filters.acc = el.dataset.id; go('cashbook'); },
+  clearFilters: () => { S.filters = { acc: '', type: '', cat: '', from: '', to: '', q: '' }; render(); },
+  goImport: () => go('import'),
+  pickFile: () => $id('importFile').click(),
+  importRestart: () => { S.importStep = 1; S.importParsed = null; render(); },
+  importCommit: commitImport,
+  downloadTemplate: () => downloadTemplate(true),
+  exportXlsx: () => downloadTemplate(false),
+  exportCsv, exportPlCsv, exportVatCsv, exportJson,
+  saveCompany: () => {
+    DATA.settings.co.name = $id('coName').value.trim() || DATA.settings.co.name;
+    DATA.settings.co.addr = $id('coAddr').value.trim();
+    DATA.lockDate = $id('lockDate').value || '';
+    save(); render(); toast('Settings saved.', 'ok');
+  },
+  pickRestore: () => $id('restoreFile').click(),
+  resetData: () => {
+    if (!confirm('Erase ALL data on this device and start fresh? Export a backup first if unsure.')) return;
+    DATA = freshData(); save(); render(); toast('All data erased.', 'ok');
+  }
+};
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (fn) { e.preventDefault(); fn(el, e); }
+});
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.id === 'importFile' && t.files[0]) { readFile(t.files[0]); t.value = ''; }
+  if (t.id === 'restoreFile' && t.files[0]) {
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const d = JSON.parse(rd.result);
+        if (!d.tx || !d.settings || !d.accounts) throw new Error('Not an AVA Cash Book backup');
+        if (!confirm('Replace all data on this device with the backup?')) return;
+        DATA = d; save(); render(); toast('Backup restored.', 'ok');
+      } catch (err) { toast('Restore failed: ' + err.message, 'bad'); }
+    };
+    rd.readAsText(t.files[0]);
+  }
+  const fmap = { facc: 'acc', fcat: 'cat', ftype: 'type', ffrom: 'from', fto: 'to' };
+  if (fmap[t.id]) { S.filters[fmap[t.id]] = t.value; render(); }
+  if (t.id === 'fq') { S.filters.q = t.value; }
+  if (t.id === 'plFrom') { S.plFrom = t.value; render(); }
+  if (t.id === 'plTo') { S.plTo = t.value; render(); }
+  if (t.id === 'vatQ') { S.vatQ = parseInt(t.value, 10); render(); }
+});
+document.addEventListener('input', (e) => { if (e.target.id === 'fq') { S.filters.q = e.target.value; clearTimeout(window._qT); window._qT = setTimeout(() => { const el = document.activeElement; render(); const nq = $id('fq'); if (nq) { nq.focus(); nq.setSelectionRange(nq.value.length, nq.value.length); } }, 350); } });
+document.addEventListener('dragover', (e) => { const d = e.target.closest('#drop'); if (d) { e.preventDefault(); d.classList.add('drag'); } });
+document.addEventListener('dragleave', (e) => { const d = e.target.closest('#drop'); if (d) d.classList.remove('drag'); });
+document.addEventListener('drop', (e) => {
+  const d = e.target.closest('#drop'); if (!d) return;
+  e.preventDefault(); d.classList.remove('drag');
+  if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+});
+
+DATA = loadData();
+render();
+
+/* ================= AVA CASH BOOK — SYNC LAYER (local Excel + Google) ================= */
+const SYNC_KEY = 'ava-sync-cfg-v1';
+
+function loadSyncCfg() {
+  try { const raw = localStorage.getItem(SYNC_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return { auto: true, localName: '', gUrl: '', lastLocal: null, lastPush: null, lastBackup: null, log: [] };
+}
+S.sync = loadSyncCfg();
+function saveSyncCfg() { try { localStorage.setItem(SYNC_KEY, JSON.stringify(S.sync)); } catch (e) {} }
+function syncLog(msg, kind) {
+  S.sync.log.unshift({ t: new Date().toLocaleString('en-GB'), msg, kind: kind || '' });
+  S.sync.log = S.sync.log.slice(0, 40);
+  saveSyncCfg();
+}
+
+/* ---------- IndexedDB for the Excel file handle ---------- */
+function idb() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('ava-cashbook', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('handles');
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+async function idbSet(key, val) { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction('handles', 'readwrite'); tx.objectStore('handles').put(val, key); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+async function idbGet(key) { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction('handles', 'readonly'); const rq = tx.objectStore('handles').get(key); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); }); }
+async function idbDel(key) { const db = await idb(); return new Promise((res) => { const tx = db.transaction('handles', 'readwrite'); tx.objectStore('handles').delete(key); tx.oncomplete = res; }); }
+const supportsLocalLink = () => !!window.showOpenFilePicker;
+
+/* ---------- Local Excel link (File System Access API — Chrome / Edge) ---------- */
+let LOCAL_HANDLE = null;
+async function linkLocalFile() {
+  if (!supportsLocalLink()) { toast('Your browser does not support linking a file. Use Chrome or Edge, or use Settings → Excel export.', 'bad'); return; }
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{ description: 'AVA Cash Book workbook', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }],
+      multiple: false
+    });
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      const p2 = await handle.requestPermission({ mode: 'readwrite' });
+      if (p2 !== 'granted') { toast('Permission denied — the file was not linked.', 'bad'); return; }
+    }
+    LOCAL_HANDLE = handle;
+    S.sync.localName = handle.name;
+    await idbSet('localXlsx', handle);
+    syncLog('Linked Excel file: ' + handle.name, 'ok');
+    saveSyncCfg(); render();
+    if (confirm('Linked "' + handle.name + '".\n\nWrite the current app data into this file now? (Choose Cancel if the file already holds your data and you want to keep it.)')) {
+      await writeLocalNow();
+    } else { toast('File linked. Use "Push to Excel" or "Pull from Excel" on the Sync tab.', 'ok'); }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    console.error(e); toast('Could not link file: ' + (e.message || e), 'bad');
+  }
+}
+async function ensureLocalPermission() {
+  if (!LOCAL_HANDLE) return false;
+  let perm = await LOCAL_HANDLE.queryPermission({ mode: 'readwrite' });
+  if (perm === 'prompt') perm = await LOCAL_HANDLE.requestPermission({ mode: 'readwrite' });
+  return perm === 'granted';
+}
+async function writeLocalNow() {
+  if (!LOCAL_HANDLE) { toast('No Excel file is linked yet.', 'bad'); return; }
+  if (!(await ensureLocalPermission())) { toast('Permission needed — click "Re-connect file".', 'bad'); S.sync.localPerm = false; saveSyncCfg(); render(); return; }
+  try {
+    const wb = buildWorkbook(DATA);
+    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const writable = await LOCAL_HANDLE.createWritable();
+    await writable.write(out);
+    await writable.close();
+    S.sync.lastLocal = new Date().toISOString();
+    syncLog('Pushed app data → ' + LOCAL_HANDLE.name + ' (' + liveTx().length + ' entries)', 'ok');
+    saveSyncCfg(); render(); toast('Saved to ' + LOCAL_HANDLE.name, 'ok');
+  } catch (e) { console.error(e); syncLog('Excel write failed: ' + e.message, 'bad'); saveSyncCfg(); render(); toast('Write failed: ' + e.message, 'bad'); }
+}
+async function readLocalNow() {
+  if (!LOCAL_HANDLE) { toast('No Excel file is linked yet.', 'bad'); return; }
+  if (!(await ensureLocalPermission())) { toast('Permission needed — click "Re-connect file".', 'bad'); return; }
+  try {
+    const file = await LOCAL_HANDLE.getFile();
+    const buf = await file.arrayBuffer();
+    ingestWorkbook(new Uint8Array(buf), file.name);
+    toast('File loaded — review the import preview.', 'ok');
+  } catch (e) { console.error(e); toast('Read failed: ' + e.message, 'bad'); }
+}
+async function regrantLocal() {
+  if (!LOCAL_HANDLE) { await linkLocalFile(); return; }
+  const perm = await LOCAL_HANDLE.requestPermission({ mode: 'readwrite' });
+  S.sync.localPerm = perm === 'granted';
+  saveSyncCfg(); render();
+  toast(perm === 'granted' ? 'File access re-granted.' : 'Permission still denied.', perm === 'granted' ? 'ok' : 'bad');
+}
+async function unlinkLocal() {
+  if (!confirm('Unlink the Excel file? The app data stays untouched.')) return;
+  await idbDel('localXlsx');
+  LOCAL_HANDLE = null; S.sync.localName = ''; saveSyncCfg(); render(); toast('Excel file unlinked.', 'ok');
+}
+async function restoreLocalHandle() {
+  try {
+    const h = await idbGet('localXlsx');
+    if (!h) return;
+    LOCAL_HANDLE = h;
+    S.sync.localName = h.name || '';
+    S.sync.localPerm = (await h.queryPermission({ mode: 'readwrite' })) === 'granted';
+    saveSyncCfg(); render();
+  } catch (e) { console.warn('handle restore failed', e); }
+}
+
+/* ---------- Google Sheets / Drive bridge (Apps Script web app) ---------- */
+async function bridgeCall(payload) {
+  if (!S.sync.gUrl) { toast('Paste your Apps Script web-app URL first (Sync & Backup → Google).', 'bad'); return null; }
+  try {
+    const resp = await fetch(S.sync.gUrl, {
+      method: 'POST', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const txt = await resp.text();
+    let out;
+    try { out = JSON.parse(txt); }
+    catch (e) {
+      if (/<html/i.test(txt)) throw new Error('The script URL returned a web page instead of data — re-deploy the web app (Deploy → New deployment → Web app) and copy the /exec URL.');
+      throw new Error('Unexpected response: ' + txt.slice(0, 120));
+    }
+    if (!out.ok) throw new Error(out.error || 'Script reported an error');
+    return out;
+  } catch (e) {
+    console.error(e);
+    syncLog('Google: ' + e.message, 'bad'); saveSyncCfg(); render();
+    toast('Google: ' + e.message, 'bad');
+    return null;
+  }
+}
+async function saveGoogleUrl() {
+  const url = ($id('gUrl') || {}).value || '';
+  if (!/https:\/\/script\.google\.com\/.+\/exec/.test(url.trim())) { toast('Paste the web-app URL ending in /exec.', 'bad'); return; }
+  S.sync.gUrl = url.trim(); saveSyncCfg();
+  const r = await bridgeCall({ action: 'ping' });
+  if (r) { syncLog('Connected to Google Sheet "' + r.name + '"', 'ok'); saveSyncCfg(); toast('Connected: ' + r.name, 'ok'); }
+  render();
+}
+async function pushGoogle() {
+  const r = await bridgeCall({ action: 'push', data: { accounts: DATA.accounts.map((a) => ({ name: a.name, kind: a.kind, opening: a.opening })), tx: liveTx() } });
+  if (r) {
+    S.sync.lastPush = new Date().toISOString();
+    syncLog('Pushed ' + r.rows + ' entries → Google Sheet "' + (r.sheet || '') + '"', 'ok');
+    saveSyncCfg(); render(); toast('Pushed ' + r.rows + ' entries to Google Sheets.', 'ok');
+  }
+}
+async function pullGoogle() {
+  const r = await bridgeCall({ action: 'pull' });
+  if (!r) return;
+  const sheetRows = [ ['Date','Account','Description','Debit (Money In)','Credit (Money Out)','Category','Subcategory','Party / Paid To','Vehicle','Driver','Payment Method','Cheque No','Reference','VAT Mode','VAT Amount (AED)','Notes'] ].concat(r.transactions || []);
+  const parsed = rowsFromSheet(sheetRows);
+  parsed.fileName = 'Google Sheet'; parsed.sheetName = 'Transactions';
+  parsed.newAccounts = [];
+  const existing = new Set(DATA.accounts.map((a) => a.name.toLowerCase()));
+  (r.accounts || []).slice(1).forEach((row) => {
+    if (!row || !row[0]) return;
+    const name = String(row[0]).trim();
+    if (!existing.has(name.toLowerCase())) parsed.newAccounts.push({ name, kind: String(row[1] || '').toLowerCase() === 'bank' ? 'bank' : 'cash', opening: parseAmount(row[2]) });
+  });
+  parsed.validation = validateImportRows(parsed.rows, DATA.accounts.concat(parsed.newAccounts.map((a) => ({ id: 'new', name: a.name }))), liveTx());
+  S.importParsed = parsed; S.importStep = 2;
+  syncLog('Pulled ' + parsed.rows.length + ' rows from Google Sheet — review preview.', 'ok'); saveSyncCfg();
+  go('import');
+}
+async function backupGoogle() {
+  const r = await bridgeCall({ action: 'backup', data: { ...DATA, exported: new Date().toISOString() } });
+  if (r) {
+    S.sync.lastBackup = new Date().toISOString();
+    S.sync.lastBackupName = r.name;
+    syncLog('Drive backup saved: ' + r.name, 'ok');
+    saveSyncCfg(); render(); toast('Backup saved to Google Drive.', 'ok');
+    window.open(r.url, '_blank');
+  }
+}
+async function listBackupsGoogle() {
+  const r = await bridgeCall({ action: 'list' });
+  if (!r) return;
+  S.sync.backups = r.files || [];
+  syncLog('Listed ' + S.sync.backups.length + ' Drive backups.', 'ok'); saveSyncCfg(); render();
+}
+async function restoreBackupGoogle(fileId, name) {
+  if (!confirm('Restore "' + name + '"? This REPLACES all data on this device with the backup.')) return;
+  const r = await bridgeCall({ action: 'read', fileId });
+  if (!r) return;
+  try {
+    const d = JSON.parse(r.data);
+    if (!d.tx || !d.accounts || !d.settings) throw new Error('Not an AVA Cash Book backup');
+    DATA = d; save(); render(); syncLog('Restored backup ' + r.name, 'ok'); saveSyncCfg(); toast('Backup restored.', 'ok');
+  } catch (e) { toast('Restore failed: ' + e.message, 'bad'); }
+}
+async function unlinkGoogle() {
+  if (!confirm('Remove the Google Sheets link? (Nothing is deleted in Google.)')) return;
+  S.sync.gUrl = ''; saveSyncCfg(); render(); toast('Google link removed.', 'ok');
+}
+
+/* ---------- auto-sync hook ---------- */
+let _syncTimer = null;
+function syncAfterChange() {
+  if (!S.sync || !S.sync.auto) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(async () => {
+    if (LOCAL_HANDLE) await writeLocalNow();
+    if (S.sync.gUrl) { const r = await bridgeCall({ action: 'push', data: { accounts: DATA.accounts.map((a) => ({ name: a.name, kind: a.kind, opening: a.opening })), tx: liveTx() } }); if (r) { S.sync.lastPush = new Date().toISOString(); saveSyncCfg(); } }
+  }, 4000);
+}
+const _saveOrig = save;
+save = function (silent) { _saveOrig(silent); try { syncAfterChange(); } catch (e) { console.warn(e); } };
+
+/* ---------- Sync tab ---------- */
+function syncChip(ok, txt) { return '<span class="chip ' + (ok ? 'ok' : 'neutral') + '">' + txt + '</span>'; }
+function viewSync() {
+  const localReady = !!LOCAL_HANDLE;
+  let h = '<div class="hero"><div><h2>Sync &amp; Backup</h2><p>Keep the same numbers on your PC Excel file, Google Sheets and Google Drive</p></div><div>' +
+    '<label style="font-weight:400;font-size:13px"><input type="checkbox" id="syncAuto"' + (S.sync.auto ? ' checked' : '') + '> Auto-sync after every change</label></div></div>';
+
+  // ---- local excel ----
+  h += '<div class="card"><div class="card-h"><h3>💻 Excel workbook on this PC</h3>' + (localReady ? syncChip(S.sync.localPerm !== false, S.sync.localPerm === false ? 'Needs permission' : 'Linked: ' + esc(S.sync.localName)) : '<span class="chip neutral">Not linked</span>') + '</div><div class="card-b">';
+  if (!supportsLocalLink()) h += '<div class="alert warn"><b>This browser cannot link a local file directly.</b> Direct read/write of a file on your PC works in <b>Chrome and Edge</b>. Here (Safari/Firefox or iPhone), use the Import Excel tab + Settings → Excel export instead — same data, two clicks.</div>';
+  h += '<p class="tiny muted">One Excel workbook stays linked: every change is written back to that exact file, and you can pull its contents back into the app for review. The link is remembered on this browser; the browser may ask you to re-confirm access when you reopen the app.</p>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+    '<button class="btn btn-primary btn-xs" data-act="linkLocal">' + (localReady ? 'Change file…' : '🔗 Link Excel file') + '</button>' +
+    (localReady ? '<button class="btn btn-xs" data-act="writeLocal">⭳ Push app → Excel</button>' +
+    '<button class="btn btn-xs" data-act="readLocal">⭱ Pull Excel → review</button>' +
+    '<button class="btn btn-xs" data-act="regrantLocal">🔓 Re-connect file</button>' +
+    '<button class="btn btn-danger btn-xs" data-act="unlinkLocal">Unlink</button>' : '') + '</div>';
+  if (S.sync.lastLocal) h += '<p class="tiny muted mt">Last write: ' + new Date(S.sync.lastLocal).toLocaleString('en-GB') + '</p>';
+  h += '</div></div>';
+
+  // ---- google ----
+  const gOn = !!S.sync.gUrl;
+  h += '<div class="card"><div class="card-h"><h3>🟢 Google Sheets &amp; Drive</h3>' + (gOn ? '<span class="chip ok">Linked</span>' : '<span class="chip neutral">Not linked</span>') + '</div><div class="card-b">';
+  h += '<div class="formgrid">' +
+    '<div class="field full"><label>Apps Script web-app URL (ends in /exec)</label><input id="gUrl" value="' + esc(S.sync.gUrl) + '" placeholder="https://script.google.com/macros/s/…/exec"></div></div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+    '<button class="btn btn-primary btn-xs" data-act="saveGoogleUrl">Save &amp; test connection</button>' +
+    (gOn ? '<button class="btn btn-xs" data-act="pushGoogle">⭱ Push app → Sheet</button>' +
+    '<button class="btn btn-xs" data-act="pullGoogle">⭱ Pull Sheet → review</button>' +
+    '<button class="btn btn-gold btn-xs" data-act="backupGoogle">☁ Backup to Drive now</button>' +
+    '<button class="btn btn-xs" data-act="listBackups">📄 List Drive backups</button>' +
+    '<button class="btn btn-danger btn-xs" data-act="unlinkGoogle">Unlink</button>' : '') + '</div>';
+  if (S.sync.lastPush) h += '<p class="tiny muted mt">Last push: ' + new Date(S.sync.lastPush).toLocaleString('en-GB') + (S.sync.lastBackup ? ' · Last Drive backup: ' + new Date(S.sync.lastBackup).toLocaleString('en-GB') + (S.sync.lastBackupName ? ' (' + esc(S.sync.lastBackupName) + ')' : '') : '') + '</p>';
+  if (S.sync.backups && S.sync.backups.length) {
+    h += '<div class="tablewrap mt"><table><thead><tr><th>Backup file (Google Drive)</th><th>Saved</th><th></th></tr></thead><tbody>' +
+      S.sync.backups.map((f) => '<tr><td>' + esc(f.name) + '</td><td class="tiny">' + new Date(f.date).toLocaleString('en-GB') + '</td><td><a class="btn btn-xs" href="' + esc(f.url) + '" target="_blank">Open</a> <button class="btn btn-xs" data-act="restoreBackup" data-id="' + esc(f.id) + '" data-name="' + esc(f.name) + '">Restore</button></td></tr>').join('') +
+      '</tbody></table></div>';
+  }
+  h += '<details class="mt"><summary class="btn btn-xs" style="display:inline-block">⚙ One-time Google setup (5 minutes)</summary>' +
+    '<div class="alert mt"><b>Setup steps</b><br>' +
+    '1. Create a Google Sheet named e.g. <b>AVA Cash Book</b>.<br>' +
+    '2. In the Sheet: <b>Extensions → Apps Script</b>, delete the sample code, paste the full contents of <b>Code.gs</b> (downloaded with this app), and press 💾.<br>' +
+    '3. Click <b>Deploy → New deployment</b> → type <b>Web app</b>.<br>' +
+    '4. Set <b>Execute as: Me</b> and <b>Who has access: Anyone</b> → Deploy → authorise (Advanced → Go to… → Allow).<br>' +
+    '5. Copy the <b>Web app URL</b> (ends in /exec) and paste it above → Save &amp; test.<br>' +
+    '<span class="tiny">The script then writes your Accounts + Transactions into that Sheet and saves dated JSON backups into a Drive folder "AVA Cash Book Backups". This method needs no Google login inside the app, so it also works when the app is opened as a local file.</span></div></details>';
+  h += '</div></div>';
+
+  // ---- log ----
+  h += '<div class="card"><div class="card-h"><h3>Activity log</h3><button class="btn btn-xs" data-act="clearSyncLog">Clear</button></div><div class="card-b tiny">' +
+    (S.sync.log.length ? S.sync.log.map((l) => '<div class="' + (l.kind === 'bad' ? 'neg' : '') + '">· [' + esc(l.t) + '] ' + esc(l.msg) + '</div>').join('') : '<span class="muted">No sync activity yet.</span>') + '</div></div>';
+  return h;
+}
+
+Object.assign(ACTIONS, {
+  linkLocal: linkLocalFile,
+  writeLocal: writeLocalNow,
+  readLocal: readLocalNow,
+  regrantLocal: regrantLocal,
+  unlinkLocal: unlinkLocal,
+  saveGoogleUrl: saveGoogleUrl,
+  pushGoogle: pushGoogle,
+  pullGoogle: pullGoogle,
+  backupGoogle: backupGoogle,
+  listBackups: listBackupsGoogle,
+  restoreBackup: (el) => restoreBackupGoogle(el.dataset.id, el.dataset.name || ''),
+  unlinkGoogle: unlinkGoogle,
+  clearSyncLog: () => { S.sync.log = []; saveSyncCfg(); render(); }
+});
+document.addEventListener('change', (e) => { if (e.target.id === 'syncAuto') { S.sync.auto = e.target.checked; saveSyncCfg(); toast('Auto-sync ' + (S.sync.auto ? 'on' : 'off') + '.', 'ok'); } });
+
+restoreLocalHandle();
+
+/* ================= VOUCHERS — register, modal, words engine, A4 print ================= */
+const PV_RE = /^PV-(\d{2})\/(\d{4})-(\d+)$/;
+
+/* per-month sequence that never collides: scans ALL tx incl. deleted */
+function nextVoucherNo(date) {
+  const d = date || today();
+  const mm = d.slice(5, 7), yy = d.slice(0, 4);
+  let max = 0;
+  (DATA.tx || []).forEach((t) => {
+    if (!t.pv) return;
+    const m = PV_RE.exec(t.pv);
+    if (m && m[1] === mm && m[2] === yy) max = Math.max(max, parseInt(m[3], 10) || 0);
+  });
+  return 'PV-' + mm + '/' + yy + '-' + String(max + 1).padStart(2, '0');
+}
+
+/* line totals + UAE 5% VAT (pure — unit-tested in Node) */
+function voucherTotals(lines, mode) {
+  let gross = 0;
+  (lines || []).forEach((l) => {
+    const q = parseFloat(String(l.qty == null || l.qty === '' ? 1 : l.qty).replace(/[^\d.]/g, '')) || 1;
+    gross += Math.round(parseAmount(l.rate) * q);
+  });
+  let net = gross, vat = 0;
+  if (mode === 'included') { net = Math.round(gross * 100 / 105); vat = gross - net; }
+  else if (mode === 'added') { vat = Math.round(gross * 5 / 100); gross = net + vat; }
+  return { net, vat, total: gross };
+}
+
+/* one voucher = one tx in DATA.tx (type 'out') carrying pv / lines / partyTrn */
+function buildVoucherTx(v) {
+  const acc = (DATA.accounts || []).find((a) => a.id === v.acc) || DATA.accounts[0];
+  const t = voucherTotals(v.lines, v.vatMode || 'none');
+  const now = Date.now();
+  return {
+    uid: 'pv-' + now.toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+    createdAt: now, deleted: false, tr: '',
+    date: v.date || today(), acc: acc.id, accName: acc.name, type: 'out',
+    amt: t.total, vat: t.vat, vatMode: v.vatMode || 'none',
+    desc: (v.lines && v.lines[0] && v.lines[0].desc) || 'Payment voucher',
+    party: v.payee || '', partyTrn: v.payeeTrn || '',
+    cat: v.cat || 'Other', sub: v.sub || '', veh: v.veh || '', drv: v.drv || '',
+    pm: v.pm || 'Cash', chq: v.chq || undefined, ref: v.pvNo || '', notes: v.notes || '',
+    pv: v.pvNo, lines: v.lines || [], by: 'voucher'
+  };
+}
+
+/* payee autocomplete index from past transactions */
+function payeeIndex() {
+  const map = new Map();
+  liveTx().forEach((t) => {
+    if (!t.party) return;
+    if (!map.has(t.party)) map.set(t.party, { trn: '' });
+    if (t.partyTrn && !map.get(t.party).trn) map.get(t.party).trn = t.partyTrn;
+  });
+  return map;
+}
+
+/* ---------- register ---------- */
+function viewVouchers() {
+  S.vFilter = S.vFilter || { q: '', acc: '' };
+  const f = S.vFilter;
+  let rows = DATA.tx.filter((t) => t.pv && !t.deleted)
+    .sort((a, b) => b.date === a.date ? (b.createdAt || 0) - (a.createdAt || 0) : (b.date > a.date ? 1 : -1));
+  if (f.acc) rows = rows.filter((t) => t.acc === f.acc);
+  if (f.q) {
+    const q = f.q.toLowerCase();
+    rows = rows.filter((t) => [t.pv, t.party, t.partyTrn, t.desc, t.pm, t.chq, (t.lines || []).map((l) => l.desc).join(' ')].some((x) => (x || '').toLowerCase().includes(q)));
+  }
+  const tot = rows.reduce((s, t) => s + t.amt, 0), vatT = rows.reduce((s, t) => s + (t.vat || 0), 0);
+  let h = '<div class="hero"><div><h2>Payment Vouchers</h2><p>Official PV register — each voucher posts one entry into the cash book</p></div><div>' +
+    '<button class="btn btn-gold btn-xs" data-act="newVoucher">▦ New Voucher</button> ' +
+    '<button class="btn btn-xs" data-act="exportVouchersCsv">⭳ CSV</button></div></div>';
+  h += '<div class="card"><div class="filters">' +
+    '<div class="field"><label>Account</label><select id="vfacc"><option value="">All accounts</option>' + DATA.accounts.map((a) => '<option value="' + esc(a.id) + '"' + (f.acc === a.id ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field" style="min-width:240px"><label>Search</label><input id="vfq" placeholder="voucher no, payee, item, cheque…" value="' + esc(f.q) + '"></div>' +
+    '<button class="btn btn-xs" data-act="vClearFilters">Clear</button></div>';
+  h += '<div class="card-h" style="padding:10px 16px"><h3>' + rows.length + ' voucher(s)</h3><div><span class="chip bad">Total ' + fmt(tot) + '</span> <span class="chip warn">VAT ' + fmt(vatT) + '</span></div></div>';
+  h += '<div class="tablewrap"><table><thead><tr><th>Voucher No</th><th>Date</th><th>Payee</th><th>Account</th><th>Items</th><th>Method</th><th class="num">VAT</th><th class="num">Total</th><th></th></tr></thead><tbody>';
+  h += rows.map((t) => '<tr><td class="strong">' + esc(t.pv) + '</td><td>' + esc(t.date) + '</td>' +
+    '<td>' + esc(t.party || '—') + (t.partyTrn ? '<br><span class="tiny muted">TRN ' + esc(t.partyTrn) + '</span>' : '') + '</td>' +
+    '<td><span class="badge-acc">' + esc(t.accName || t.acc) + '</span></td>' +
+    '<td>' + (t.lines || []).length + ' item(s)<br><span class="tiny muted">' + esc((t.lines[0] || {}).desc || '') + '</span></td>' +
+    '<td>' + esc(t.pm || '') + (t.chq ? '<br><span class="tiny muted">chq ' + esc(t.chq) + '</span>' : '') + '</td>' +
+    '<td class="num">' + fmt2(t.vat || 0) + '</td><td class="num strong neg">' + fmt2(t.amt) + '</td>' +
+    '<td class="num" style="white-space:nowrap"><button class="btn btn-xs" data-act="printVoucher" data-id="' + esc(t.uid) + '">🖨 Print</button> <button class="btn btn-xs" data-act="editVoucher" data-id="' + esc(t.uid) + '">Edit</button> <button class="btn btn-danger btn-xs" data-act="delVoucher" data-id="' + esc(t.uid) + '">Del</button></td></tr>').join('');
+  if (!rows.length) h += '<tr><td colspan="9" class="muted">No vouchers yet — create the first one.</td></tr>';
+  h += '</tbody></table></div></div>';
+  return h;
+}
+
+/* ---------- creation / edit modal ---------- */
+function vLineRow(l) {
+  l = l || { desc: '', qty: '1', rate: '' };
+  return '<div class="vline">' +
+    '<input class="vl-desc" placeholder="Description of item / service" value="' + esc(l.desc) + '">' +
+    '<input class="vl-qty" inputmode="decimal" placeholder="Qty" value="' + esc(l.qty == null || l.qty === '' ? '1' : l.qty) + '">' +
+    '<input class="vl-rate" inputmode="decimal" placeholder="Rate AED" value="' + esc(l.rate == null ? '' : l.rate) + '">' +
+    '<span class="vl-amt tiny muted" style="text-align:right"></span>' +
+    '<button class="btn btn-danger btn-xs" data-act="vDelLine" title="Remove line">✕</button></div>';
+}
+function collectVLines() {
+  const out = [];
+  document.querySelectorAll('#vLines .vline').forEach((row) => {
+    out.push({
+      desc: row.querySelector('.vl-desc').value.trim(),
+      qty: row.querySelector('.vl-qty').value,
+      rate: row.querySelector('.vl-rate').value
+    });
+  });
+  return out;
+}
+function recalcVoucherTotals() {
+  const lines = collectVLines();
+  const mode = ($id('vVat') || {}).value || 'none';
+  const t = voucherTotals(lines, mode);
+  const set = (id, v) => { const el = $id(id); if (el) el.textContent = v; };
+  set('vSub', fmt2(t.net)); set('vVatV', fmt2(t.vat)); set('vTot', fmt(t.total)); set('vWords', words(t.total));
+  document.querySelectorAll('#vLines .vline').forEach((row) => {
+    const q = parseFloat(String(row.querySelector('.vl-qty').value || '1').replace(/[^\d.]/g, '')) || 1;
+    const amt = Math.round(parseAmount(row.querySelector('.vl-rate').value) * q);
+    row.querySelector('.vl-amt').textContent = fmt2(amt);
+  });
+}
+function readVoucherForm(uid) {
+  const lines = collectVLines().filter((l) => l.desc || parseAmount(l.rate));
+  if (!lines.length) { toast('Add at least one line item with an amount.', 'bad'); return null; }
+  const date = $id('vDate').value || today();
+  if (locked(date)) { toast('That period is locked.', 'bad'); return null; }
+  const accId = $id('vAcc').value;
+  const acc = DATA.accounts.find((a) => a.id === accId);
+  if (!acc) { toast('Pick an account.', 'bad'); return null; }
+  const pm = $id('vPm').value, chq = $id('vChq').value.trim();
+  if (chq && acc.kind !== 'bank') { toast('Cheque numbers need a Bank-type account.', 'bad'); return null; }
+  const pvNo = ($id('pvNo').value || '').trim() || nextVoucherNo(date);
+  if (DATA.tx.some((t) => t.pv === pvNo && t.uid !== uid && !t.deleted)) { toast('Voucher number ' + pvNo + ' is already used.', 'bad'); return null; }
+  return {
+    date, acc: accId, pvNo,
+    payee: $id('vPayee').value.trim(), payeeTrn: $id('vTrn').value.trim(),
+    cat: $id('vCat').value, sub: $id('vSubSel').value,
+    veh: $id('vVeh').value.trim(), drv: $id('vDrv').value.trim(),
+    pm, chq, vatMode: $id('vVat').value, notes: $id('vNotes').value.trim(), lines
+  };
+}
+function openVoucherModal(uid) {
+  const t = uid ? DATA.tx.find((x) => x.uid === uid && x.pv) : null;
+  const payees = payeeIndex();
+  const date = t ? t.date : today();
+  const pvNo = t ? t.pv : nextVoucherNo(date);
+  const body = '<div class="formgrid">' +
+    '<div class="field"><label>Voucher No</label><input id="pvNo" value="' + esc(pvNo) + '"></div>' +
+    '<div class="field"><label>Date</label><input type="date" id="vDate" value="' + date + '"></div>' +
+    '<div class="field"><label>Paid from account</label><select id="vAcc">' + DATA.accounts.map((a) => '<option value="' + esc(a.id) + '"' + (t && t.acc === a.id ? ' selected' : '') + '>' + esc(a.name) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Payment method</label><select id="vPm">' + ['Cash', 'Cheque', 'Bank Transfer', 'Card'].map((m) => '<option' + ((t ? t.pm : 'Cash') === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Payee</label><input id="vPayee" list="dlPayees" value="' + esc(t ? t.party || '' : '') + '" placeholder="beneficiary"></div>' +
+    '<div class="field"><label>Payee TRN</label><input id="vTrn" value="' + esc(t ? t.partyTrn || '' : '') + '" placeholder="auto-fills for known payees"></div>' +
+    '<div class="field"><label>Category</label><select id="vCat">' + Object.keys(DATA.settings.cats).map((c) => '<option' + (t && t.cat === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select></div>' +
+    '<div class="field"><label>Subcategory</label><select id="vSubSel"></select></div>' +
+    '<div class="field"><label>Vehicle</label><input id="vVeh" value="' + esc(t ? t.veh || '' : '') + '"></div>' +
+    '<div class="field"><label>Driver</label><input id="vDrv" value="' + esc(t ? t.drv || '' : '') + '"></div>' +
+    '<div class="field"><label>Cheque No (if Cheque)</label><input id="vChq" value="' + esc(t ? t.chq || '' : '') + '"></div>' +
+    '<div class="field"><label>VAT mode</label><select id="vVat">' + [['none', 'No VAT'], ['included', 'VAT included (amounts include 5%)'], ['added', 'VAT added (+5% on top)']].map((m) => '<option value="' + m[0] + '"' + ((t ? (t.vatMode || 'none') : 'none') === m[0] ? ' selected' : '') + '>' + m[1] + '</option>').join('') + '</select></div>' +
+    '<div class="field full"><label>Notes</label><input id="vNotes" value="' + esc(t ? t.notes || '' : '') + '"></div>' +
+    '</div>' +
+    '<datalist id="dlPayees">' + [...payees.keys()].map((p) => '<option value="' + esc(p) + '">').join('') + '</datalist>' +
+    '<div class="section-lbl" style="margin-top:12px">Line items</div>' +
+    '<div id="vLines">' + ((t && t.lines && t.lines.length ? t.lines : [{ desc: '', qty: '1', rate: '' }]).map(vLineRow).join('')) + '</div>' +
+    '<button class="btn btn-xs" data-act="vAddLine">+ Add line item</button>' +
+    '<div class="mt" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px 12px">' +
+    '<span class="tiny muted">Subtotal <b id="vSub">0.00</b></span><span class="tiny muted">VAT <b id="vVatV">0.00</b></span>' +
+    '<span class="tiny">Total <b id="vTot">AED 0.00</b></span></div>' +
+    '<div class="tiny muted mt"><b>In words:</b> <span id="vWords"></span></div>';
+  openModal('<div class="modal-h"><h3>' + (t ? 'Edit voucher ' + esc(t.pv) : 'New payment voucher') + '</h3><button class="x" data-act="closeModal">✕</button></div><div class="modal-b">' + body + '</div>' +
+    '<div class="modal-f"><button class="btn" data-act="closeModal">Cancel</button>' +
+    '<button class="btn btn-gold" data-act="printPreviewVoucher">🖨 Print preview</button>' +
+    '<button class="btn btn-primary" data-act="saveVoucher" data-id="' + esc(uid || '') + '">' + (t ? 'Update voucher' : 'Post voucher') + '</button></div>', 'wide');
+  const catSel = $id('vCat');
+  const fillSub = () => {
+    const subs = DATA.settings.cats[catSel.value] || [];
+    $id('vSubSel').innerHTML = '<option value=""></option>' + subs.map((s) => '<option' + (t && t.sub === s ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
+  };
+  fillSub(); catSel.addEventListener('change', fillSub);
+  recalcVoucherTotals();
+}
+function saveVoucherFromModal(uid) {
+  const v = readVoucherForm(uid);
+  if (!v) return;
+  const tx = buildVoucherTx(v);
+  if (uid) {
+    const i = DATA.tx.findIndex((x) => x.uid === uid);
+    if (i >= 0) DATA.tx[i] = { ...tx, uid, createdAt: DATA.tx[i].createdAt };
+  } else DATA.tx.unshift(tx);
+  save(); closeModal(); render();
+  if (S.tab !== 'vouchers') go('vouchers');
+  toast(uid ? 'Voucher updated.' : 'Voucher ' + v.pvNo + ' posted — ' + fmt(tx.amt) + '.', 'ok');
+}
+
+/* ---------- A4 print sheet ---------- */
+function voucherSheetHtml(t) {
+  const co = DATA.settings.co || { name: 'AVA PASSENGERS TRANSPORT', addr: '' };
+  const L = t.lines || [];
+  const mode = t.vatMode || 'none';
+  const rowsHtml = L.map((l, i) => {
+    const q = parseFloat(String(l.qty == null || l.qty === '' ? 1 : l.qty).replace(/[^\d.]/g, '')) || 1;
+    const amt = Math.round(parseAmount(l.rate) * q);
+    return '<tr><td style="width:8mm">' + (i + 1) + '</td><td>' + esc(l.desc) + '</td><td class="num" style="width:18mm">' + esc(String(l.qty == null || l.qty === '' ? '1' : l.qty)) + '</td><td class="num" style="width:26mm">' + fmt2(parseAmount(l.rate)) + '</td><td class="num" style="width:30mm">' + fmt2(amt) + '</td></tr>';
+  }).join('');
+  const blankRows = Math.max(0, Math.min(4, 6 - L.length));
+  const blanks = Array.from({ length: blankRows }, () => '<tr><td></td><td style="height:7mm"></td><td></td><td></td><td></td></tr>').join('');
+  const tfoot = (mode === 'added')
+    ? '<tr><td colspan="4" class="num">Subtotal (net)</td><td class="num">' + fmt2(t.amt - (t.vat || 0)) + '</td></tr>' +
+      '<tr><td colspan="4" class="num">VAT 5%</td><td class="num">' + fmt2(t.vat || 0) + '</td></tr>' +
+      '<tr><td colspan="4" class="num"><b>Total payable</b></td><td class="num"><b>' + fmt2(t.amt) + '</b></td></tr>'
+    : (mode === 'included'
+      ? '<tr><td colspan="4" class="num">Total (VAT inclusive)</td><td class="num"><b>' + fmt2(t.amt) + '</b></td></tr>' +
+        '<tr><td colspan="4" class="num">of which VAT 5% (net ' + fmt2(t.amt - (t.vat || 0)) + ')</td><td class="num">' + fmt2(t.vat || 0) + '</td></tr>'
+      : '<tr><td colspan="4" class="num"><b>Total payable</b></td><td class="num"><b>' + fmt2(t.amt) + '</b></td></tr>');
+  return '<div class="pv-sheet">' +
+    '<div class="pv-head"><div class="pv-mark">AVA</div><div class="pv-co">' + esc(co.name) + '<div class="tiny">' + esc(co.addr || '') + '</div></div>' +
+    '<div style="text-align:right" class="tiny muted">Voucher<br><b style="font-size:14px">' + esc(t.pv) + '</b></div></div>' +
+    '<div class="pv-title">PAYMENT VOUCHER</div>' +
+    '<table class="pv-meta"><tr><td style="width:22%"><b>Date:</b> ' + esc(t.date) + '</td><td style="width:28%"><b>Paid from:</b> ' + esc(t.accName || t.acc) + '</td><td><b>Payment method:</b> ' + esc(t.pm || '') + (t.chq ? ' · Cheque No ' + esc(t.chq) : '') + '</td></tr>' +
+    '<tr><td colspan="2"><b>Paid to:</b> ' + esc(t.party || '—') + '</td><td><b>TRN:</b> ' + esc(t.partyTrn || '—') + '</td></tr>' +
+    '<tr><td colspan="3"><b>Category:</b> ' + esc((t.cat || '') + (t.sub ? ' / ' + t.sub : '')) + (t.veh ? ' · <b>Vehicle:</b> ' + esc(t.veh) : '') + (t.drv ? ' · <b>Driver:</b> ' + esc(t.drv) : '') + '</td></tr></table>' +
+    '<table class="pv-items"><thead><tr><th>#</th><th>Description</th><th class="num">Qty</th><th class="num">Rate (AED)</th><th class="num">Amount (AED)</th></tr></thead><tbody>' +
+    rowsHtml + blanks +
+    '</tbody><tfoot>' + tfoot + '</tfoot></table>' +
+    '<div class="pv-words"><b>Amount in words:</b> ' + esc(words(t.amt)) + '</div>' +
+    (t.notes ? '<div class="pv-note"><b>Notes:</b> ' + esc(t.notes) + '</div>' : '') +
+    '<table class="pv-sign"><tr><td style="width:33%">Prepared By</td><td style="width:34%">Approved By</td><td style="width:33%">Received By (signature &amp; date)</td></tr></table>' +
+    '<div class="pv-foot tiny">' + esc(co.name) + ' · ' + esc(co.addr || '') + ' — voucher ' + esc(t.pv) + ' generated by AVA Cash Book</div></div>';
+}
+function printVoucherTx(uid) {
+  const t = DATA.tx.find((x) => x.uid === uid && x.pv);
+  if (!t) return toast('Voucher not found.', 'bad');
+  const host = document.getElementById('printArea');
+  if (!host) return toast('Print area missing.', 'bad');
+  host.innerHTML = voucherSheetHtml(t);
+  window.print();
+}
+
+/* ---------- voucher CSV ---------- */
+function exportVouchersCsv() {
+  const head = ['Voucher No', 'Date', 'Account', 'Payee', 'Payee TRN', 'Category', 'Sub', 'Vehicle', 'Driver', 'Payment Method', 'Cheque No', 'VAT Mode', 'VAT (AED)', 'Total (AED)', 'Items'];
+  const rows = DATA.tx.filter((t) => t.pv && !t.deleted).map((t) => [t.pv, t.date, t.accName || t.acc, t.party || '', t.partyTrn || '', t.cat || '', t.sub || '', t.veh || '', t.drv || '', t.pm || '', t.chq || '', t.vatMode || 'none', (t.vat / 100).toFixed(2), (t.amt / 100).toFixed(2), (t.lines || []).map((l) => l.desc + ' x' + (l.qty || 1) + ' @' + ((parseAmount(l.rate) || 0) / 100).toFixed(2)).join(' | ')]);
+  download('ava-vouchers-' + today() + '.csv', new Blob([toCsv([head, ...rows])], { type: 'text/csv;charset=utf-8' }));
+  toast('Voucher CSV downloaded.', 'ok');
+}
+
+/* ---------- wiring ---------- */
+Object.assign(ACTIONS, {
+  newVoucher: () => openVoucherModal(null),
+  editVoucher: (el) => openVoucherModal(el.dataset.id),
+  saveVoucher: (el) => saveVoucherFromModal(el.dataset.id || null),
+  printVoucher: (el) => printVoucherTx(el.dataset.id),
+  printPreviewVoucher: () => {
+    const v = readVoucherForm(null);
+    if (!v) return;
+    const host = document.getElementById('printArea');
+    if (!host) return;
+    host.innerHTML = voucherSheetHtml(buildVoucherTx(v));
+    window.print();
+  },
+  delVoucher: (el) => {
+    const t = DATA.tx.find((x) => x.uid === el.dataset.id);
+    if (!t) return;
+    if (!confirm('Delete voucher ' + t.pv + ' (' + fmt(t.amt) + ')? The cash-book entry is removed and the voucher number is never reused.')) return;
+    t.deleted = true; save(); render(); toast('Voucher ' + t.pv + ' deleted.', 'ok');
+  },
+  vAddLine: () => { const host = $id('vLines'); if (host) { host.insertAdjacentHTML('beforeend', vLineRow()); recalcVoucherTotals(); const rows = host.querySelectorAll('.vline .vl-desc'); if (rows.length) rows[rows.length - 1].focus(); } },
+  vDelLine: (el) => { const row = el.closest('.vline'); if (row) { row.remove(); recalcVoucherTotals(); } },
+  vClearFilters: () => { S.vFilter = { q: '', acc: '' }; render(); },
+  exportVouchersCsv
+});
+document.addEventListener('input', (e) => {
+  if (e.target.closest && e.target.closest('#vLines')) recalcVoucherTotals();
+  if (e.target.id === 'vVat') recalcVoucherTotals();
+  if (e.target.id === 'vfq') { S.vFilter = S.vFilter || { q: '', acc: '' }; S.vFilter.q = e.target.value; clearTimeout(window._vqT); window._vqT = setTimeout(() => { render(); const nq = $id('vfq'); if (nq) { nq.focus(); nq.setSelectionRange(nq.value.length, nq.value.length); } }, 350); }
+  if (e.target.id === 'vPayee') {
+    const rec = payeeIndex().get(e.target.value.trim());
+    const trn = $id('vTrn');
+    if (rec && rec.trn && trn && !trn.value.trim()) trn.value = rec.trn;
+  }
+});
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'vVat') recalcVoucherTotals();
+  if (e.target.id === 'vDate' && e.target.value) {
+    const no = $id('pvNo');
+    if (no && !DATA.tx.some((t) => t.pv === no.value && !t.deleted)) no.value = nextVoucherNo(e.target.value);
+  }
+  if (e.target.id === 'vfacc') { S.vFilter = S.vFilter || { q: '', acc: '' }; S.vFilter.acc = e.target.value; render(); }
+});
+
+</script>
+</body>
+</html>
